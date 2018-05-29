@@ -1,0 +1,74 @@
+def apiPropertiesFile = file("api.properties")
+def apiProperties = new Properties()
+apiProperties.load(new FileInputStream(apiPropertiesFile))
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion compileSdk
+    buildToolsVersion buildTools
+    defaultConfig {
+        applicationId "hu.am2.myway"
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [ google_maps_key: apiProperties['MAPS_KEY']]
+        }
+
+        debug {
+            manifestPlaceholders = [ google_maps_key: apiProperties['MAPS_KEY']]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:$supportLib"
+    implementation "com.android.support:customtabs:$supportLib"
+    implementation "com.android.support.constraint:constraint-layout:$constraintLayout"
+    implementation "com.android.support:recyclerview-v7:$supportLib"
+    implementation "com.android.support:design:$supportLib"
+
+    //android arch
+    implementation "android.arch.lifecycle:runtime:$archLifecycle"
+    implementation "android.arch.lifecycle:extensions:$archLifecycle"
+    annotationProcessor "android.arch.lifecycle:compiler:$archLifecycle"
+
+    //butterKnife
+    implementation "com.jakewharton:butterknife:$butterKnife"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnife"
+
+    //tibmer
+    implementation "com.jakewharton.timber:timber:$timber"
+
+    //dagger
+    implementation "com.google.dagger:dagger:$dagger"
+    implementation "com.google.dagger:dagger-android:$dagger"
+    implementation "com.google.dagger:dagger-android-support:$dagger"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
+
+    //maps, locations, ads
+    implementation "com.google.android.gms:play-services-maps:$playServices"
+    implementation "com.google.android.gms:play-services-location:$playServices"
+    implementation "com.google.android.gms:play-services-ads:$playServices"
+
+    testImplementation "junit:junit:$junit"
+
+    androidTestImplementation "com.android.support.test:runner:$runner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso"
+}

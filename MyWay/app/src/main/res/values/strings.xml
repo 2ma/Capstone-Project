@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">MyWay</string>
+    <string name="title_activity_map">Map</string>
+    <string name="missing_permission">Requires location permission</string>
+    <string name="speed">Speed:</string>
+    <string name="time">Time:</string>
+    <string name="save_track">Save track</string>
+    <string name="distance">Distance</string>
+    <string name="distance_unit">%0.1f m</string>
+    <string name="speed_unit">%.1f km/h</string>
+    <string name="speed_default">0.0 km/h</string>
+    <string name="time_default">0:00:00</string>
+    <string name="distance_default">0 m</string>
+</resources>
