@@ -15,8 +15,11 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,9 +43,10 @@ import hu.am2.myway.R;
 import hu.am2.myway.Utils;
 import hu.am2.myway.location.LocationService;
 import hu.am2.myway.location.model.Track;
+import hu.am2.myway.ui.settings.SettingsActivity;
 import timber.log.Timber;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
 
@@ -68,6 +72,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     @BindView(R.id.bottomSheet)
     ConstraintLayout bottomSheet;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -95,11 +102,27 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         setContentView(R.layout.activity_map);
 
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @OnClick(R.id.fab)

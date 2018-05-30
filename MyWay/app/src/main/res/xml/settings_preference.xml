@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/recording_time_interval"
+        android:entryValues="@array/recording_time_interval_values"
+        android:key="@string/recording_time_interval_key"
+        android:title="@string/recording_time_interval_title"
+        android:summary="@string/recording_time_interval_summary"
+        />
+    <ListPreference
+        android:defaultValue="10"
+        android:entries="@array/recording_distance_interval"
+        android:entryValues="@array/recording_distance_interval_values"
+        android:key="@string/recording_distance_interval_key"
+        android:title="@string/recording_distance_interval_title"
+        android:summary="@string/recording_distance_interval_summary"
+        />
+    <ListPreference
+        android:defaultValue="50"
+        android:entries="@array/gps_accuracy"
+        android:entryValues="@array/gps_accuracy_values"
+        android:key="@string/gps_accuracy_key"
+        android:title="@string/gps_accuracy_title"
+        android:summary="@string/gps_accuracy_summary"
+        />
+
+</PreferenceScreen>

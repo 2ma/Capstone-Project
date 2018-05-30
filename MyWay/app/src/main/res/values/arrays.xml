@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="recording_time_interval">
+        <item>Smallest (recommended)</item>
+        <item>2 s</item>
+        <item>3 s</item>
+        <item>4 s</item>
+        <item>5 s</item>
+        <item>10 s</item>
+        <item>20 s</item>
+        <item>30 s</item>
+        <item>1 min</item>
+    </string-array>
+    <string-array name="recording_time_interval_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="recording_distance_interval">
+        <item>1 m</item>
+        <item>2 m</item>
+        <item>5 m</item>
+        <item>10 m (recommended)</item>
+        <item>20 m</item>
+        <item>50 m</item>
+        <item>100 m</item>
+    </string-array>
+    <string-array name="recording_distance_interval_values">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>50</item>
+        <item>100</item>
+    </string-array>
+    <string-array name="gps_accuracy">
+        <item>10 m (excellent GPS)</item>
+        <item>20 m</item>
+        <item>30 m</item>
+        <item>50 m (recommended)</item>
+        <item>100 m</item>
+        <item>200 m</item>
+    </string-array>
+    <string-array name="gps_accuracy_values">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+    </string-array>
+</resources>

@@ -11,4 +11,17 @@
     <string name="speed_default">0.0 km/h</string>
     <string name="time_default">0:00:00</string>
     <string name="distance_default">0 m</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="recording_time_interval_key">record_time_interval</string>
+    <string name="recording_time_interval_title">Recording time interval</string>
+    <string name="recording_distance_interval_key">recording_distance_interval_key</string>
+    <string name="recording_distance_interval_title">Recording distance interval</string>
+    <string name="gps_accuracy_key">gps_accuracy_key</string>
+    <string name="gps_accuracy_title">Gps accuracy</string>
+    <string name="recording_time_interval_summary">%s between recorded locations</string>
+    <string name="recording_distance_interval_summary">%s between recorded locations</string>
+    <string name="gps_accuracy_summary">Location is ignoder if its accuracy is less than %s</string>
+    <string name="settings">Settings</string>
 </resources>

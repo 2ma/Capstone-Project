@@ -21,11 +21,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            manifestPlaceholders = [ google_maps_key: apiProperties['MAPS_KEY']]
+            manifestPlaceholders = [google_maps_key: apiProperties['MAPS_KEY']]
         }
 
         debug {
-            manifestPlaceholders = [ google_maps_key: apiProperties['MAPS_KEY']]
+            manifestPlaceholders = [google_maps_key: apiProperties['MAPS_KEY']]
         }
     }
 
@@ -42,10 +42,13 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$constraintLayout"
     implementation "com.android.support:recyclerview-v7:$supportLib"
     implementation "com.android.support:design:$supportLib"
+    implementation "com.android.support:preference-v7:$supportLib"
 
     //android arch
     implementation "android.arch.lifecycle:runtime:$archLifecycle"
     implementation "android.arch.lifecycle:extensions:$archLifecycle"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:support-v4:27.1.1'
     annotationProcessor "android.arch.lifecycle:compiler:$archLifecycle"
 
     //butterKnife
