@@ -5,22 +5,25 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,14 +39,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hu.am2.myway.AppExecutors;
+import hu.am2.myway.Constants;
 import hu.am2.myway.R;
 import hu.am2.myway.Utils;
+import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.LocationService;
-import hu.am2.myway.location.model.Track;
-import hu.am2.myway.ui.settings.SettingsActivity;
+import hu.am2.myway.location.model.Way;
+import hu.am2.myway.location.model.WayStatus;
 import timber.log.Timber;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -53,13 +63,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationService locationService = null;
 
     private Polyline path = null;
-    private Marker currentPosition = null;
+    private Marker currentMarker = null;
     private Circle circle = null;
 
     private boolean bound = false;
 
-    @BindView(R.id.fab)
-    FloatingActionButton recordButton;
+    @Inject
+    AppExecutors executors;
+
+    @Inject
+    Repository repository;
+
+    @BindView(R.id.startPauseBtn)
+    ImageButton startPauseBtn;
 
     @BindView(R.id.speed)
     TextView speedText;
@@ -80,7 +96,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             locationService = ((LocationService.ServiceBinder) service).getService();
-            locationService.getTrackLiveData().observe(MapActivity.this, track -> handleTrackData(track));
+            locationService.getWayStatusLiveData().observe(MapActivity.this, wayStatus -> {
+                if (wayStatus != null) {
+                    handleWayStatus(wayStatus);
+                } else {
+                    clearUi();
+                }
+            });
             locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
             bound = true;
         }
@@ -103,6 +125,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.map);
@@ -111,70 +135,120 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+    public void onBackPressed() {
+        if (stopRecordingDialog()) return;
+        super.onBackPressed();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+        if (item.getItemId() == android.R.id.home) {
+            if (stopRecordingDialog()) return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.fab)
+    private boolean stopRecordingDialog() {
+        int state = locationService.getRecordingState();
+        if (state == WayStatus.STATE_RECORDING || state == WayStatus.STATE_PAUSE) {
+            AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
+            aBuilder.setMessage(R.string.stop_recording);
+            aBuilder.setPositiveButton(R.string.yes, (dialog, which) -> onStopClicked());
+            aBuilder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            });
+            AlertDialog dialog = aBuilder.create();
+            dialog.show();
+            return true;
+        }
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putInt(Constants.PREF_RECORDING_STATE, WayStatus.STATE_STOP).apply();
+        return false;
+    }
+
+    private void clearUi() {
+        playPauseButtonState(false);
+        speedText.setText(R.string.speed_default);
+        timeText.setText(R.string.time_default);
+        distanceText.setText(R.string.distance_default);
+        if (path != null) {
+            path.remove();
+            path = null;
+        }
+        if (circle != null) {
+            circle.remove();
+            circle = null;
+        }
+        if (currentMarker != null) {
+            currentMarker.remove();
+            currentMarker = null;
+        }
+    }
+
+    @OnClick(R.id.startPauseBtn)
     public void recordPause(View view) {
         recording();
     }
 
     private void playPauseButtonState(boolean state) {
         if (state) {
-            recordButton.setImageResource(R.drawable.ic_pause_black_24dp);
+            startPauseBtn.setImageResource(R.drawable.ic_pause_black_24dp);
         } else {
-            recordButton.setImageResource(R.drawable.ic_fiber_manual_record_black_24dp);
+            startPauseBtn.setImageResource(R.drawable.ic_fiber_manual_record_black_24dp);
         }
     }
 
-    private void handleTrackData(Track track) {
+    @OnClick(R.id.stopBtn)
+    public void onStopClicked() {
+        WayStatus status = locationService.getWayStatus();
+        if (status != null) {
+            String name = status.getWay().getWayName();
+            locationService.stopRecording();
+            AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
+            EditText wayNameView = new EditText(this);
+            wayNameView.setText(name);
+            aBuilder.setView(wayNameView);
+            aBuilder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                String n = wayNameView.getText().toString();
+                if (n.trim().length() > 0 && !name.equals(n)) {
+                    Way w = status.getWay();
+                    w.setWayName(n);
+                    executors.getDiskIO().execute(() -> repository.updateWay(w));
+                }
+                finish();
+            });
+            AlertDialog nameDialog = aBuilder.create();
+            nameDialog.show();
+        }
+    }
 
-        switch (track.getState()) {
-            case Track.STATE_WAITING_FOR_SIGNAL: {
+    private void handleWayStatus(WayStatus status) {
+
+        switch (status.getState()) {
+            case WayStatus.STATE_WAITING_FOR_SIGNAL: {
                 //TODO display waiting signal message
                 Toast.makeText(this, "Waiting for signal", Toast.LENGTH_SHORT).show();
                 playPauseButtonState(true);
-                Timber.d("trackWaiting");
                 break;
             }
-            case Track.STATE_PAUSE: {
+            case WayStatus.STATE_PAUSE: {
                 playPauseButtonState(false);
-                Snackbar.make(bottomSheet, R.string.save_track, Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, v -> locationService
-                    .saveTrack()).show();
-                Timber.d("trackPause");
+                showWayPath(status.getWayPoints());
+                distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
                 break;
             }
-            case Track.STATE_RECORDING: {
-                Timber.d("trackRecord");
+            case WayStatus.STATE_RECORDING: {
+                Timber.d("startPauseRecording");
                 playPauseButtonState(true);
-                Location location = track.getLastLocation();
+                Location location = status.getLastLocation();
                 if (location != null) {
                     LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (path != null) {
-                        path.remove();
-                        path = null;
-                    }
-                    path = map.addPolyline(new PolylineOptions()
-                        .color(Color.GREEN)
-                        .width(3)
-                        .addAll(track.getPath()));
+                    showWayPath(status.getWayPoints());
 
-                    if (currentPosition == null) {
-                        currentPosition = map.addMarker(new MarkerOptions().position(pos));
+                    if (currentMarker == null) {
+                        currentMarker = map.addMarker(new MarkerOptions().position(pos));
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
                     } else {
-                        currentPosition.setPosition(pos);
+                        currentMarker.setPosition(pos);
                         map.animateCamera(CameraUpdateFactory.newLatLng(pos));
                     }
                     if (circle == null) {
@@ -186,10 +260,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         circle.setCenter(pos);
                     }
                     speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
-                    distanceText.setText(getString(R.string.distance_unit, track.getTotalDistance()));
+                    distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
                 }
                 break;
             }
+        }
+    }
+
+    private void showWayPath(List<LatLng> wayPoints) {
+        if (wayPoints.size() > 0) {
+            if (path != null) {
+                path.remove();
+                path = null;
+            }
+            path = map.addPolyline(new PolylineOptions()
+                .color(Color.GREEN)
+                .width(3)
+                .addAll(wayPoints));
+        } else if (path != null) {
+            path.remove();
+            path = null;
         }
     }
 
@@ -198,7 +288,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 13);
             return;
         }
-        locationService.recording();
+        locationService.startPauseRecording();
     }
 
     @Override

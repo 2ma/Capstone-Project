@@ -16,6 +16,13 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
+        //used by Room, to test migrations
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -43,19 +50,24 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:$supportLib"
     implementation "com.android.support:design:$supportLib"
     implementation "com.android.support:preference-v7:$supportLib"
+    implementation "com.android.support:recyclerview-v7:$supportLib"
 
     //android arch
     implementation "android.arch.lifecycle:runtime:$archLifecycle"
     implementation "android.arch.lifecycle:extensions:$archLifecycle"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     annotationProcessor "android.arch.lifecycle:compiler:$archLifecycle"
+
+    //room
+    implementation "android.arch.persistence.room:runtime:$room"
+    annotationProcessor "android.arch.persistence.room:compiler:$room"
 
     //butterKnife
     implementation "com.jakewharton:butterknife:$butterKnife"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnife"
 
-    //tibmer
+    //timber
     implementation "com.jakewharton.timber:timber:$timber"
 
     //dagger
@@ -70,8 +82,12 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:$playServices"
     implementation "com.google.android.gms:play-services-ads:$playServices"
 
+    //test
     testImplementation "junit:junit:$junit"
 
+    //instrument test
     androidTestImplementation "com.android.support.test:runner:$runner"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso"
+    androidTestImplementation "android.arch.core:core-testing:$archLifecycle"
+
 }

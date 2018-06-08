@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="guideLineTop" type="dimen" format="float">0.35</item>
+</resources>

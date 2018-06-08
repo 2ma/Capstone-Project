@@ -1,0 +1,74 @@
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#09C"
+            android:columnCount="2"
+            android:rowCount="3"
+            android:useDefaultMargins="true"
+            android:alignmentMode="alignBounds"
+    >
+
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="8dp"
+        android:background="#09C"
+        android:gravity="center"
+        android:contentDescription="@string/distance_content"
+        android:text="@string/time_default"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"
+        android:layout_columnSpan="2"/>
+
+    <TextView
+        android:id="@+id/distanceText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:background="#09C"
+        android:contentDescription="@string/time_content"
+        android:text="@string/distance_default"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"
+        android:layout_columnSpan="2"
+        />
+
+    <ImageButton
+        android:id="@+id/playPauseBtn"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_columnWeight="1"
+        android:layout_margin="8dp"
+        android:background="#09C"
+        android:gravity="center"
+        android:contentDescription="@string/play_pause_btn_content"
+        android:src="@drawable/ic_record_png"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"/>
+
+    <ImageButton
+        android:id="@+id/stopBtn"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_columnWeight="1"
+        android:layout_margin="8dp"
+        android:background="#09C"
+        android:gravity="center"
+        android:contentDescription="@string/stop_btn_content"
+        android:src="@drawable/ic_stop_png"
+        android:text="@string/appwidget_text"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"/>
+
+
+</GridLayout>

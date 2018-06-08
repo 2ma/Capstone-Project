@@ -26,28 +26,43 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${google_maps_key}"/>
 
-        <activity android:name=".ui.map.MapActivity">
+        <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.map.MapActivity"
+            android:parentActivityName=".ui.main.MainActivity">
+        </activity>
 
         <service
             android:name=".location.LocationService"
             android:exported="false"/>
 
-        <provider
-            android:name=".data.MyWayProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"/>
-
         <activity
             android:name=".ui.settings.SettingsActivity"
-            android:parentActivityName=".ui.map.MapActivity"
-            android:theme="@style/SettingsTheme"
-            >
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/SettingsTheme">
+        </activity>
+        <activity
+            android:name=".ui.history.HistoryActivity"
+            android:parentActivityName=".ui.main.MainActivity">
+        </activity>
+
+        <receiver android:name=".appwidget.MyWayWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/my_way_widget_info"/>
+        </receiver>
+
+        <activity android:name=".ui.saveway.SaveWayActivity">
         </activity>
     </application>
 

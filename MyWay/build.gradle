@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-alpha16'
+        classpath 'com.android.tools.build:gradle:3.2.0-alpha17'
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -22,11 +22,12 @@ ext {
     buildTools = '27.0.3'
     supportLib = '27.1.1'
     archLifecycle = '1.1.1'
+    room = '1.1.0'
     playServices = '15.0.1'
     butterKnife = '8.8.1'
     timber = '4.7.0'
     dagger = '2.16'
-    constraintLayout = '1.1.0'
+    constraintLayout = '1.1.1'
     okhttp = '3.10.0'
     okio = '1.13.0'
     retrofit = '2.3.0'
