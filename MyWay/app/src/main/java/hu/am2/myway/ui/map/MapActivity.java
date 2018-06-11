@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +51,6 @@ import hu.am2.myway.R;
 import hu.am2.myway.Utils;
 import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.LocationService;
-import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayStatus;
 import timber.log.Timber;
 
@@ -203,7 +201,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (status != null) {
             String name = status.getWay().getWayName();
             locationService.stopRecording();
-            AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
+            /*AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
             EditText wayNameView = new EditText(this);
             wayNameView.setText(name);
             aBuilder.setView(wayNameView);
@@ -217,7 +215,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 finish();
             });
             AlertDialog nameDialog = aBuilder.create();
-            nameDialog.show();
+            nameDialog.show();*/
         }
     }
 

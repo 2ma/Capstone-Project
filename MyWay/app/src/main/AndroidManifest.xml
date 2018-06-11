@@ -62,7 +62,11 @@
                 android:resource="@xml/my_way_widget_info"/>
         </receiver>
 
-        <activity android:name=".ui.saveway.SaveWayActivity">
+        <activity
+            android:name=".ui.saveway.SaveWayActivity"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:theme="@style/SaveTheme">
         </activity>
     </application>
 

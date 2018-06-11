@@ -27,6 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -43,4 +43,7 @@
     <string name="stop_btn_content">Stop button</string>
     <string name="save">Save</string>
     <string name="way_name">Way name</string>
+    <string name="recording_notification">MyWay is recording you location</string>
+    <string name="pause_notification">Pause</string>
+    <string name="stop_notification">Stop</string>
 </resources>

@@ -3,11 +3,13 @@ package hu.am2.myway.location;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Handler;
@@ -41,6 +43,8 @@ import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayPoint;
 import hu.am2.myway.location.model.WayStatus;
 import hu.am2.myway.location.model.WayWithWayPoints;
+import hu.am2.myway.ui.map.MapActivity;
+import hu.am2.myway.ui.saveway.SaveWayActivity;
 
 import static hu.am2.myway.location.LocationService.CHANNEL_ID;
 
@@ -281,6 +285,12 @@ public class LocationProvider implements SharedPreferences.OnSharedPreferenceCha
         elapsedTime.postValue(0L);
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         handler.removeCallbacksAndMessages(null);
+
+        //start save activity for name change
+        Intent saveWayIntent = new Intent(application, SaveWayActivity.class);
+        saveWayIntent.putExtra(Constants.EXTRA_WAY_ID, status.getWay().getId());
+        saveWayIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        application.startActivity(saveWayIntent);
     }
 
     LiveData<WayStatus> getWayStatusLiveData() {
@@ -322,12 +332,26 @@ public class LocationProvider implements SharedPreferences.OnSharedPreferenceCha
 
     Notification getNotification(Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
-        builder.setContentText("Running in foreground")
-            .setContentTitle("Foreground")
+        Intent pauseIntent = new Intent(context, LocationService.class);
+        pauseIntent.setAction(Constants.ACTION_START_PAUSE_RECORDING);
+        PendingIntent pausePending = PendingIntent.getService(context, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent stopIntent = new Intent(context, LocationService.class);
+        stopIntent.setAction(Constants.ACTION_STOP_RECORDING);
+        PendingIntent stopPending = PendingIntent.getService(context, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intentMapIntent = new Intent(context, MapActivity.class);
+        intentMapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent mapPending = PendingIntent.getActivity(context, 2, intentMapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setContentText(context.getString(R.string.recording_notification))
+            .setContentTitle(context.getString(R.string.app_name))
             .setOngoing(true)
             .setPriority(Notification.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_place_black_24dp)
             .setTicker("Foreground")
+            .addAction(R.drawable.ic_pause_png, context.getString(R.string.pause_notification), pausePending)
+            .addAction(R.drawable.ic_stop_png, context.getString(R.string.stop_notification), stopPending)
+            .setContentIntent(mapPending)
             .setWhen(System.currentTimeMillis());
 
         return builder.build();

@@ -35,7 +35,7 @@ public class LocationService extends Service {
     private static final String TAG = "LocationService";
 
     static final String CHANNEL_ID = "location_channel";
-    private static final int NOTIFICATION_ID = 1337;
+    static final int NOTIFICATION_ID = 1337;
 
 
     @Override
@@ -55,9 +55,9 @@ public class LocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         if (Constants.ACTION_START_PAUSE_RECORDING.equals(action)) {
-            locationProvider.startPauseRecording();
+            startPauseRecording();
         } else if (Constants.ACTION_STOP_RECORDING.equals(action)) {
-            locationProvider.stopRecording();
+            stopRecording();
         }
         return START_NOT_STICKY;
     }
