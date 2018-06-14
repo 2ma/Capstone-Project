@@ -40,7 +40,7 @@
 
         <service
             android:name=".location.LocationService"
-            android:exported="false"/>
+            android:exported="true"/>
 
         <activity
             android:name=".ui.settings.SettingsActivity"
@@ -64,10 +64,12 @@
 
         <activity
             android:name=".ui.saveway.SaveWayActivity"
+            android:noHistory="true"
             android:parentActivityName=".ui.main.MainActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             android:theme="@style/SaveTheme">
         </activity>
+        <activity android:name=".ui.permission.PermissionActivity"/>
     </application>
 
 </manifest>

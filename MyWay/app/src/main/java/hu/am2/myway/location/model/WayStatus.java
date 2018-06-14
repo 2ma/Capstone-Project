@@ -10,18 +10,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class WayStatus {
-    public static final int STATE_RECORDING = 0;
-    public static final int STATE_PAUSE = 1;
-    public static final int STATE_STOP = 2;
-
-    public static final int STATE_WAITING_FOR_SIGNAL = 4;
 
     private Location lastLocation;
     private long lastStartTime = -1;
-    private int state;
 
     private Way way;
     private List<LatLng> wayPoints = new ArrayList<>();
+
+    private static final String TAG = "WayStatus";
 
     public WayStatus() {
     }
@@ -56,25 +52,24 @@ public class WayStatus {
             return way.getTotalTime();
         }
         long t = SystemClock.elapsedRealtime() - lastStartTime;
-
         return way.getTotalTime() + Math.max(0, t);
     }
 
     public void updateCurrentLocation(Location currentLocation) {
         //save the time passed since either start, or the last location
         long currentTime = TimeUnit.NANOSECONDS.toMillis(currentLocation.getElapsedRealtimeNanos());
-        long t = currentTime - lastStartTime;
-        way.setTotalTime(way.getTotalTime() + Math.max(0, t));
-        lastStartTime = currentTime;
 
         if (lastLocation != null) {
             float totalDistance = way.getTotalDistance();
             long totalTime = way.getTotalTime();
             long movingTime = way.getMovingTime();
             totalDistance += currentLocation.distanceTo(lastLocation);
+            long lastLocationTime = TimeUnit.NANOSECONDS.toMillis(lastLocation.getElapsedRealtimeNanos());
             way.setTotalDistance(totalDistance);
-            if (currentLocation.hasSpeed()) {
-                way.setMovingTime(movingTime + t);
+            //TODO handle if last location was loaded from preferences
+            if (currentLocation.hasSpeed() || lastLocationTime != 0) {
+                long t = currentTime - lastLocationTime;
+                way.setMovingTime(movingTime + Math.max(0, t));
             }
             way.setAvgSpeed(totalDistance / totalTime);
             way.setAvgMovingSpeed(totalDistance / movingTime);
@@ -105,7 +100,6 @@ public class WayStatus {
 
     public void updateFirstLocation(Location location) {
         lastLocation = location;
-        lastStartTime = TimeUnit.NANOSECONDS.toMillis(location.getElapsedRealtimeNanos());
         checkMaxSpeed(location);
         checkAltitude(location);
         wayPoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
@@ -127,14 +121,6 @@ public class WayStatus {
         this.lastStartTime = lastStartTime;
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
     public Way getWay() {
         return way;
     }
@@ -149,5 +135,12 @@ public class WayStatus {
 
     public void setWayPoints(List<LatLng> wayPoints) {
         this.wayPoints = wayPoints;
+    }
+
+    public float currentSpeed() {
+        if (lastLocation != null) {
+            return lastLocation.getSpeed();
+        }
+        return 0;
     }
 }

@@ -46,4 +46,9 @@
     <string name="recording_notification">MyWay is recording you location</string>
     <string name="pause_notification">Pause</string>
     <string name="stop_notification">Stop</string>
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    <string name="permission_required">App can\'t function without the permission</string>
+    <string name="widget_time_text">Time:</string>
+    <string name="widget_distance_text">Distance:</string>
 </resources>

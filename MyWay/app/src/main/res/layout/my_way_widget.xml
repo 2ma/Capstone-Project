@@ -1,74 +1,87 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#09C"
+            android:background="@drawable/widget_background"
             android:columnCount="2"
             android:rowCount="3"
-            android:useDefaultMargins="true"
-            android:alignmentMode="alignBounds"
+            android:id="@+id/widget"
     >
 
     <TextView
-        android:id="@+id/timeText"
-        android:layout_width="0dp"
+        android:width="0dp"
         android:layout_height="0dp"
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        android:gravity="center"
-        android:contentDescription="@string/distance_content"
-        android:text="@string/time_default"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
+        android:layout_margin="16dp"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
         android:textStyle="bold|italic"
-        android:layout_columnSpan="2"/>
+        android:text="@string/widget_time_text"
+        />
 
     <TextView
-        android:id="@+id/distanceText"
+        android:id="@+id/widgetTimeText"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
-        android:layout_margin="8dp"
-        android:gravity="center"
-        android:background="#09C"
+        android:layout_margin="16dp"
+        android:gravity="end|center_vertical"
+        android:contentDescription="@string/distance_content"
+        android:text="@string/time_default"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold|italic"
+        />
+    <TextView
+        android:width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="16dp"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:textStyle="bold|italic"
+        android:text="@string/widget_distance_text"
+        />
+
+    <TextView
+        android:id="@+id/widgetDistanceText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="16dp"
+        android:gravity="center_vertical|end"
         android:contentDescription="@string/time_content"
         android:text="@string/distance_default"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:textSize="22sp"
         android:textStyle="bold|italic"
-        android:layout_columnSpan="2"
         />
 
     <ImageButton
-        android:id="@+id/playPauseBtn"
+        android:id="@+id/widgetRecordPauseBtn"
         android:layout_width="0dp"
         android:layout_height="54dp"
         android:layout_columnWeight="1"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        android:gravity="center"
+        android:layout_marginEnd="1dp"
+        android:background="@drawable/widget_button_background_left"
         android:contentDescription="@string/play_pause_btn_content"
-        android:src="@drawable/ic_record_png"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"/>
+        android:src="@drawable/ic_record_png"/>
 
     <ImageButton
-        android:id="@+id/stopBtn"
+        android:id="@+id/widgetStopBtn"
         android:layout_width="0dp"
         android:layout_height="54dp"
         android:layout_columnWeight="1"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        android:gravity="center"
+        android:layout_marginStart="1dp"
+        android:background="@drawable/widget_button_background_right"
         android:contentDescription="@string/stop_btn_content"
         android:src="@drawable/ic_stop_png"
-        android:text="@string/appwidget_text"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"/>
+        />
 
 
 </GridLayout>

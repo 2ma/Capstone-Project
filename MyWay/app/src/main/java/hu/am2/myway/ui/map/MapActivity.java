@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -40,19 +39,15 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import hu.am2.myway.AppExecutors;
 import hu.am2.myway.Constants;
 import hu.am2.myway.R;
 import hu.am2.myway.Utils;
-import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.LocationService;
-import hu.am2.myway.location.model.WayStatus;
-import timber.log.Timber;
+import hu.am2.myway.location.WayRecorder;
+import hu.am2.myway.location.model.WayUiModel;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -65,12 +60,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Circle circle = null;
 
     private boolean bound = false;
-
-    @Inject
-    AppExecutors executors;
-
-    @Inject
-    Repository repository;
 
     @BindView(R.id.startPauseBtn)
     ImageButton startPauseBtn;
@@ -94,14 +83,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             locationService = ((LocationService.ServiceBinder) service).getService();
-            locationService.getWayStatusLiveData().observe(MapActivity.this, wayStatus -> {
-                if (wayStatus != null) {
-                    handleWayStatus(wayStatus);
+            locationService.getWayUiModelLiveData().observe(MapActivity.this, wayModel -> {
+                if (wayModel != null) {
+                    handleWayUiModel(wayModel);
                 } else {
                     clearUi();
                 }
             });
             locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
+            locationService.getStateLiveData().observe(MapActivity.this, state -> handleState(state));
+            locationService.getLocationLiveData().observe(MapActivity.this, location -> handleLocation(location));
             bound = true;
         }
 
@@ -111,6 +102,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             bound = false;
         }
     };
+
+    private void handleLocation(Location location) {
+        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+        speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
+        if (currentMarker == null) {
+            currentMarker = map.addMarker(new MarkerOptions().position(pos));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
+        } else {
+            currentMarker.setPosition(pos);
+            map.animateCamera(CameraUpdateFactory.newLatLng(pos));
+        }
+        if (circle == null) {
+            circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
+                .fillColor(R.color.circleBackground)
+                .strokeColor(R.color.circleLine)
+                .strokeWidth(1));
+        } else {
+            circle.setCenter(pos);
+        }
+    }
+
+    private void handleState(Integer state) {
+        playPauseButtonState(state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_WAITING_FOR_SIGNAL);
+        //TODO visibility for accuracy ui element
+    }
 
     private void updateElapsedTime(Long time) {
         timeText.setText(Utils.getTimeFromMilliseconds(time));
@@ -125,7 +141,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -148,7 +164,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean stopRecordingDialog() {
         int state = locationService.getRecordingState();
-        if (state == WayStatus.STATE_RECORDING || state == WayStatus.STATE_PAUSE) {
+        if (state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_PAUSE) {
             AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
             aBuilder.setMessage(R.string.stop_recording);
             aBuilder.setPositiveButton(R.string.yes, (dialog, which) -> onStopClicked());
@@ -158,13 +174,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             dialog.show();
             return true;
         }
+        //TODO check this
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt(Constants.PREF_RECORDING_STATE, WayStatus.STATE_STOP).apply();
+        editor.putInt(Constants.PREF_RECORDING_STATE, WayRecorder.STATE_STOP).apply();
         return false;
     }
 
     private void clearUi() {
-        playPauseButtonState(false);
         speedText.setText(R.string.speed_default);
         timeText.setText(R.string.time_default);
         distanceText.setText(R.string.distance_default);
@@ -197,60 +213,42 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @OnClick(R.id.stopBtn)
     public void onStopClicked() {
-        WayStatus status = locationService.getWayStatus();
-        if (status != null) {
-            String name = status.getWay().getWayName();
+        int state = locationService.getRecordingState();
+        if (state != WayRecorder.STATE_STOP) {
             locationService.stopRecording();
-            /*AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
-            EditText wayNameView = new EditText(this);
-            wayNameView.setText(name);
-            aBuilder.setView(wayNameView);
-            aBuilder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                String n = wayNameView.getText().toString();
-                if (n.trim().length() > 0 && !name.equals(n)) {
-                    Way w = status.getWay();
-                    w.setWayName(n);
-                    executors.getDiskIO().execute(() -> repository.updateWay(w));
-                }
-                finish();
-            });
-            AlertDialog nameDialog = aBuilder.create();
-            nameDialog.show();*/
         }
     }
 
-    private void handleWayStatus(WayStatus status) {
+    private void handleWayUiModel(WayUiModel wayModel) {
 
-        switch (status.getState()) {
-            case WayStatus.STATE_WAITING_FOR_SIGNAL: {
-                //TODO display waiting signal message
-                Toast.makeText(this, "Waiting for signal", Toast.LENGTH_SHORT).show();
-                playPauseButtonState(true);
-                break;
-            }
-            case WayStatus.STATE_PAUSE: {
-                playPauseButtonState(false);
-                showWayPath(status.getWayPoints());
-                distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
-                break;
-            }
-            case WayStatus.STATE_RECORDING: {
+        distanceText.setText(getString(R.string.distance_unit, wayModel.getTotalDistance()));
+        showWayPath(wayModel.getWayPoints());
+        if (wayModel.getWayPoints().size() > 0) {
+            showWayPath(wayModel.getWayPoints());
+        } else if (path != null) {
+            path.remove();
+            path = null;
+        }
+
+        //TODO display other stats
+
+        /*case WayStatus.STATE_RECORDING: {
                 Timber.d("startPauseRecording");
                 playPauseButtonState(true);
-                Location location = status.getLastLocation();
-                if (location != null) {
-                    LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-                    showWayPath(status.getWayPoints());
+                List<LatLng> wayPoints = wayModel.getWayPoints();
+                if (wayPoints.size() > 0) {
+                    LatLng lastPos = wayPoints.get(wayPoints.size() - 1);
+                    showWayPath(wayPoints);
 
                     if (currentMarker == null) {
-                        currentMarker = map.addMarker(new MarkerOptions().position(pos));
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
+                        currentMarker = map.addMarker(new MarkerOptions().position(lastPos));
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPos, 15f));
                     } else {
-                        currentMarker.setPosition(pos);
-                        map.animateCamera(CameraUpdateFactory.newLatLng(pos));
+                        currentMarker.setPosition(lastPos);
+                        map.animateCamera(CameraUpdateFactory.newLatLng(lastPos));
                     }
                     if (circle == null) {
-                        circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
+                        circle = map.addCircle(new CircleOptions().center(lastPos).radius(location.getAccuracy())
                             .fillColor(R.color.circleBackground)
                             .strokeColor(R.color.circleLine)
                             .strokeWidth(1));
@@ -261,8 +259,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
                 }
                 break;
-            }
-        }
+            }*/
+
     }
 
     private void showWayPath(List<LatLng> wayPoints) {
@@ -282,16 +280,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void recording() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 13);
-            return;
-        }
         locationService.startPauseRecording();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 13);
+            return;
+        }
         bindService(new Intent(this, LocationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -310,7 +308,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             //TODO not necessary true
             recording();
         } else {
-            Snackbar.make(null, R.string.missing_permission, Snackbar.LENGTH_SHORT).show();
+            //TODO handle missing permission differently?
+            Toast.makeText(this, R.string.permission_required, Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
