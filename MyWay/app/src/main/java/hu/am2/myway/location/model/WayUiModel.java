@@ -34,7 +34,7 @@ public class WayUiModel {
         return totalDistance;
     }
 
-    public float getAvSpeed() {
+    public float getAvgSpeed() {
         return avSpeed;
     }
 

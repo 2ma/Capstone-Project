@@ -2,15 +2,23 @@
     <string name="app_name">MyWay</string>
     <string name="title_activity_map">Map</string>
     <string name="missing_permission">Requires location permission</string>
+
     <string name="speed">Speed:</string>
     <string name="time">Time:</string>
-    <string name="save_way">Save way</string>
     <string name="distance">Distance:</string>
+    <string name="avgSpeed">Avg. speed:</string>
+    <string name="avg_moving_speed">Avg. moving speed:</string>
+    <string name="maxAltitude">Max. alt.:</string>
+    <string name="minAltitude">Min. alt.:</string>
     <string name="distance_unit">%.1f m</string>
+    <string name="altitude_unit">%.1f m</string>
     <string name="speed_unit">%.1f km/h</string>
     <string name="speed_default">0.0 km/h</string>
     <string name="time_default">0:00:00</string>
     <string name="distance_default">0 m</string>
+    <string name="altitude_default">0 m</string>
+
+    <string name="save_way">Save way</string>
 
     <string name="recording_time_interval_key">record_time_interval</string>
     <string name="recording_time_interval_title">Recording time interval</string>
@@ -21,6 +29,7 @@
     <string name="recording_time_interval_summary">%s between recorded locations</string>
     <string name="recording_distance_interval_summary">%s between recorded locations</string>
     <string name="gps_accuracy_summary">Location is ignored if its accuracy is less than %s</string>
+
     <string name="settings">Settings</string>
     <string name="menu_new">New</string>
     <string name="menu_history">History</string>
@@ -50,9 +59,5 @@
     <string name="widget_time_text">Time:</string>
     <string name="widget_distance_text">Distance:</string>
     <string name="search">Search…</string>
-    <string name="avgSpeed">Avg. speed:</string>
-    <string name="avg_moving_speed">Avg. moving speed:</string>
-    <string name="maxAltitude">Max. alt.:</string>
-    <string name="altitude_default">0 m</string>
-    <string name="minAltitude">Min. alt.:</string>
+
 </resources>

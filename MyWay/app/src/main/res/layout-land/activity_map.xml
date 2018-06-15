@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/colorPrimary"
+        />
+
+    <fragment android:id="@+id/map"
+              android:name="com.google.android.gms.maps.SupportMapFragment"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="0dp"
+              android:layout_height="0dp"
+              app:layout_constraintTop_toBottomOf="@id/toolbar"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintEnd_toStartOf="@+id/detailViewPager"
+              app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
+              tools:context=".ui.map.MapActivity"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/detailViewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toEndOf="@id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
+        />
+    <!--based on: https://stackoverflow.com/questions/20586619/android-viewpager-with-bottom-dots-->
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabDots"
+        app:layout_constraintBottom_toBottomOf="@id/detailViewPager"
+        app:layout_constraintStart_toStartOf="@id/detailViewPager"
+        app:layout_constraintEnd_toEndOf="@id/detailViewPager"
+        app:tabBackground="@drawable/tab_selector"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+    <ImageButton
+        android:id="@+id/startPauseBtn"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        app:srcCompat="@drawable/ic_play_arrow_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/stopBtn"
+        android:background="@color/colorPrimary"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:contentDescription="@string/record_pause_btn_content"/>
+
+    <ImageButton
+        android:id="@+id/stopBtn"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/startPauseBtn"
+        app:srcCompat="@drawable/ic_stop_24dp"
+        android:background="@color/colorPrimary"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:contentDescription="@string/stop_btn_content"/>
+
+</android.support.constraint.ConstraintLayout>

@@ -213,6 +213,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         speedText.setText(R.string.speed_default);
         timeText.setText(R.string.time_default);
         distanceText.setText(R.string.distance_default);
+
+        avgSpeed.setText(R.string.speed_default);
+        avgMovingSpeed.setText(R.string.speed_default);
+        maxAltitude.setText(R.string.altitude_default);
+        minAltitude.setText(R.string.altitude_default);
+
         if (path != null) {
             path.remove();
             path = null;
@@ -260,6 +266,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         //TODO display other stats
+        avgSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgSpeed()));
+        avgMovingSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgMovingSpeed()));
+        maxAltitude.setText(getString(R.string.altitude_unit, wayModel.getMaxAltitude()));
+        minAltitude.setText(getString(R.string.altitude_unit, wayModel.getMinAltitude()));
 
         /*case WayStatus.STATE_RECORDING: {
                 Timber.d("startPauseRecording");
