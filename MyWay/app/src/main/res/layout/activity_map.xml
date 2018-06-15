@@ -36,6 +36,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
         />
+    <!--based on: https://stackoverflow.com/questions/20586619/android-viewpager-with-bottom-dots-->
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabDots"
+        app:layout_constraintBottom_toBottomOf="@id/detailViewPager"
+        app:layout_constraintStart_toStartOf="@id/detailViewPager"
+        app:layout_constraintEnd_toEndOf="@id/detailViewPager"
+        app:tabBackground="@drawable/tab_selector"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
 
     <ImageButton
         android:id="@+id/startPauseBtn"

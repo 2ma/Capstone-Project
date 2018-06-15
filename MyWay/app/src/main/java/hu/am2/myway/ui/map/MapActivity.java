@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -64,6 +65,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @BindView(R.id.startPauseBtn)
     ImageButton startPauseBtn;
+
+    @BindView(R.id.tabDots)
+    TabLayout tabLayout;
 
     //details pager layout 1
     TextView speedText;
@@ -170,6 +174,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         detailsPagerAdapter.addLayout(layoutTwo);
 
         detailViewPager.setAdapter(detailsPagerAdapter);
+        tabLayout.setupWithViewPager(detailViewPager, true);
     }
 
     @Override

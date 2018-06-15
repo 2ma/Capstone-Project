@@ -52,7 +52,7 @@
     <string name="search">Search…</string>
     <string name="avgSpeed">Avg. speed:</string>
     <string name="avg_moving_speed">Avg. moving speed:</string>
-    <string name="maxAltitude">Max. altitude:</string>
+    <string name="maxAltitude">Max. alt.:</string>
     <string name="altitude_default">0 m</string>
-    <string name="minAltitude">Min. altitude:</string>
+    <string name="minAltitude">Min. alt.:</string>
 </resources>
