@@ -1,0 +1,91 @@
+package hu.am2.myway.ui.history;
+
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Gravity;
+import android.widget.TextView;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
+import hu.am2.myway.Constants;
+import hu.am2.myway.R;
+import hu.am2.myway.location.model.Way;
+
+public class HistoryListActivity extends AppCompatActivity implements HistoryAdapter.HistoryClickListener {
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.searchView)
+    SearchView searchView;
+
+    @BindView(R.id.historyList)
+    RecyclerView historyList;
+
+    @BindView(R.id.emptyView)
+    TextView emptyView;
+
+    private HistoryAdapter adapter;
+
+    private HistoryListViewModel viewModel;
+
+    private static final String TAG = "HistoryListActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_history_list);
+
+        ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        searchView.setLayoutParams(new Toolbar.LayoutParams(Gravity.END));
+
+        historyList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new HistoryAdapter(getResources(), historyList, emptyView, this);
+        historyList.setAdapter(adapter);
+        ItemTouchHelper.SimpleCallback callback = new SwipeToDeleteCallback(this) {
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                Way way = adapter.getWay(viewHolder.getAdapterPosition());
+                viewModel.deleteWay(way);
+            }
+        };
+        ItemTouchHelper helper = new ItemTouchHelper(callback);
+        helper.attachToRecyclerView(historyList);
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(HistoryListViewModel.class);
+
+        viewModel.getAllWays().observe(this, this::displayWayList);
+    }
+
+    private void displayWayList(List<Way> ways) {
+        adapter.setWays(ways);
+    }
+
+    @Override
+    public void onItemClicked(long id) {
+        Intent intent = new Intent(this, HistoryMapActivity.class);
+        intent.putExtra(Constants.EXTRA_WAY_ID, id);
+        startActivity(intent);
+    }
+}

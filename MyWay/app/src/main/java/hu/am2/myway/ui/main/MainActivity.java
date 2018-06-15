@@ -22,7 +22,7 @@ import hu.am2.myway.Constants;
 import hu.am2.myway.R;
 import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.WayRecorder;
-import hu.am2.myway.ui.history.HistoryActivity;
+import hu.am2.myway.ui.history.HistoryListActivity;
 import hu.am2.myway.ui.map.MapActivity;
 import hu.am2.myway.ui.settings.SettingsActivity;
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.historyBtn)
     public void onHistoryClick() {
-        startActivity(new Intent(this, HistoryActivity.class));
+        startActivity(new Intent(this, HistoryListActivity.class));
     }
 
     @OnClick(R.id.settingsBtn)

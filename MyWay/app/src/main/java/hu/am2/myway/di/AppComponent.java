@@ -10,7 +10,7 @@ import dagger.android.AndroidInjectionModule;
 import hu.am2.myway.App;
 
 @Singleton
-@Component(modules = {AndroidInjectionModule.class, ActivityModule.class, AppModule.class, ServiceModule.class, FragmentModule.class,
+@Component(modules = {AndroidInjectionModule.class, ActivityModule.class, AppModule.class, ServiceModule.class,
     ViewModelModule.class, BroadcastModule.class})
 public interface AppComponent {
 

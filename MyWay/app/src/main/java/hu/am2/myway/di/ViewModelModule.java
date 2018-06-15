@@ -6,7 +6,8 @@ import android.arch.lifecycle.ViewModelProvider;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
-import hu.am2.myway.ui.history.HistoryViewModel;
+import hu.am2.myway.ui.history.HistoryListViewModel;
+import hu.am2.myway.ui.history.HistoryMapViewModel;
 import hu.am2.myway.ui.saveway.SaveWayViewModel;
 import hu.am2.myway.viewmodelfactory.MyWayViewModelFactory;
 
@@ -33,13 +34,18 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(HistoryViewModel.class)
-    abstract ViewModel bindHistoryViewModel(HistoryViewModel historyViewModel);
+    @ViewModelKey(HistoryListViewModel.class)
+    abstract ViewModel bindHistoryListViewModel(HistoryListViewModel historyListViewModel);
 
     @Binds
     @IntoMap
     @ViewModelKey(SaveWayViewModel.class)
     abstract ViewModel bindSaveWayViewModel(SaveWayViewModel saveWayViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HistoryMapViewModel.class)
+    abstract ViewModel bindHistoryMapViewModel(HistoryMapViewModel historyMapViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(MyWayViewModelFactory factory);

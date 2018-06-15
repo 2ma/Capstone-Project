@@ -28,7 +28,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
     private TextView emptyView;
 
     public interface HistoryClickListener {
-        void onItemClicked(Way way);
+        void onItemClicked(long id);
     }
 
     private HistoryClickListener listener;
@@ -67,6 +67,10 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
         checkEmpty();
     }
 
+    public Way getWay(int position) {
+        return ways.get(position);
+    }
+
     private void checkEmpty() {
         if (getItemCount() > 0) {
             historyList.setVisibility(View.VISIBLE);
@@ -102,7 +106,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
 
         @Override
         public void onClick(View v) {
-            listener.onItemClicked(ways.get(getAdapterPosition()));
+            listener.onItemClicked(ways.get(getAdapterPosition()).getId());
         }
     }
 }

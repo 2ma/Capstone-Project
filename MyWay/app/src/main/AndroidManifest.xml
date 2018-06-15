@@ -48,7 +48,7 @@
             android:theme="@style/SettingsTheme">
         </activity>
         <activity
-            android:name=".ui.history.HistoryActivity"
+            android:name=".ui.history.HistoryListActivity"
             android:parentActivityName=".ui.main.MainActivity">
         </activity>
 
@@ -66,10 +66,14 @@
             android:name=".ui.saveway.SaveWayActivity"
             android:noHistory="true"
             android:parentActivityName=".ui.main.MainActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:theme="@style/SaveTheme">
+            android:theme="@style/SaveTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize">
         </activity>
         <activity android:name=".ui.permission.PermissionActivity"/>
+        <activity
+            android:name=".ui.history.HistoryMapActivity"
+            android:parentActivityName=".ui.history.HistoryListActivity">
+        </activity>
     </application>
 
 </manifest>
