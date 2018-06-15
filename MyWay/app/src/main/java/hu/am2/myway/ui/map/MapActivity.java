@@ -13,9 +13,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -48,6 +48,7 @@ import hu.am2.myway.Utils;
 import hu.am2.myway.location.LocationService;
 import hu.am2.myway.location.WayRecorder;
 import hu.am2.myway.location.model.WayUiModel;
+import hu.am2.myway.ui.history.DetailsPagerAdapter;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -64,17 +65,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @BindView(R.id.startPauseBtn)
     ImageButton startPauseBtn;
 
-    @BindView(R.id.speed)
+    //details pager layout 1
     TextView speedText;
-
-    @BindView(R.id.time)
     TextView timeText;
-
-    @BindView(R.id.distance)
     TextView distanceText;
 
-    @BindView(R.id.bottomSheet)
-    ConstraintLayout bottomSheet;
+    //details pager layout 2
+    TextView avgSpeed;
+    TextView avgMovingSpeed;
+    TextView maxAltitude;
+    TextView minAltitude;
+
+    @BindView(R.id.detailViewPager)
+    ViewPager detailViewPager;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -146,6 +149,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        setupDetailsPager();
+
+    }
+
+    private void setupDetailsPager() {
+        View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
+        speedText = layoutOne.findViewById(R.id.speed);
+        timeText = layoutOne.findViewById(R.id.time);
+        distanceText = layoutOne.findViewById(R.id.distance);
+
+        View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
+        avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
+        avgMovingSpeed = layoutTwo.findViewById(R.id.avgMovingSpeed);
+        maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
+        minAltitude = layoutTwo.findViewById(R.id.minAltitude);
+
+        DetailsPagerAdapter detailsPagerAdapter = new DetailsPagerAdapter();
+        detailsPagerAdapter.addLayout(layoutOne);
+        detailsPagerAdapter.addLayout(layoutTwo);
+
+        detailViewPager.setAdapter(detailsPagerAdapter);
     }
 
     @Override

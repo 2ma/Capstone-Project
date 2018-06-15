@@ -5,7 +5,7 @@
     <string name="speed">Speed:</string>
     <string name="time">Time:</string>
     <string name="save_way">Save way</string>
-    <string name="distance">Distance</string>
+    <string name="distance">Distance:</string>
     <string name="distance_unit">%.1f m</string>
     <string name="speed_unit">%.1f km/h</string>
     <string name="speed_default">0.0 km/h</string>
@@ -31,15 +31,13 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="no_history">No history</string>
     <string name="menu_map">Map</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="time_content">Time length for way</string>
     <string name="distance_content">Distance for way</string>
-    <string name="play_pause_btn_content">Play and Pause button</string>
+    <string name="record_pause_btn_content">Play and Pause button</string>
     <string name="stop_btn_content">Stop button</string>
     <string name="save">Save</string>
     <string name="way_name">Way name</string>
@@ -51,5 +49,10 @@
     <string name="permission_required">App can\'t function without the permission</string>
     <string name="widget_time_text">Time:</string>
     <string name="widget_distance_text">Distance:</string>
-    <string name="search">Search...</string>
+    <string name="search">Search…</string>
+    <string name="avgSpeed">Avg. speed:</string>
+    <string name="avg_moving_speed">Avg. moving speed:</string>
+    <string name="maxAltitude">Max. altitude:</string>
+    <string name="altitude_default">0 m</string>
+    <string name="minAltitude">Min. altitude:</string>
 </resources>

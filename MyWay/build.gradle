@@ -27,7 +27,7 @@ ext {
     butterKnife = '8.8.1'
     timber = '4.7.0'
     dagger = '2.16'
-    constraintLayout = '1.1.1'
+    constraintLayout = '1.1.2'
     okhttp = '3.10.0'
     okio = '1.13.0'
     retrofit = '2.3.0'

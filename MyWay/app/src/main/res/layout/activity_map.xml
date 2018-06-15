@@ -24,87 +24,18 @@
               app:layout_constraintTop_toBottomOf="@id/toolbar"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintBottom_toTopOf="@id/detailViewPager"
               tools:context=".ui.map.MapActivity"/>
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/bottomSheet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/detailViewPager"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        tools:layout_height="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
-        android:layout_marginBottom="4dp"
-        app:layout_behavior="@string/bottom_sheet_behavior"
-        >
-
-        <TextView
-            android:id="@+id/speedTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:text="@string/speed"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <TextView
-            android:id="@+id/speed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="24dp"
-            android:text="@string/speed_default"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="37km/h"/>
-
-        <TextView
-            android:id="@+id/timeTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="@string/time"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/speedTitle"/>
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="@string/time_default"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/speedTitle"
-            tools:text="1:30"/>
-
-        <TextView
-            android:id="@+id/distanceTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="@string/distance"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timeTitle"/>
-
-        <TextView
-            android:id="@+id/distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="@string/distance_default"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/time"
-            tools:text="50m"/>
-
-    </android.support.constraint.ConstraintLayout>
+        />
 
     <ImageButton
         android:id="@+id/startPauseBtn"
@@ -116,8 +47,7 @@
         app:layout_constraintEnd_toStartOf="@+id/stopBtn"
         android:background="@color/colorPrimary"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:elevation="8dp"
-        />
+        android:contentDescription="@string/record_pause_btn_content"/>
 
     <ImageButton
         android:id="@+id/stopBtn"
@@ -129,7 +59,6 @@
         app:srcCompat="@drawable/ic_stop_24dp"
         android:background="@color/colorPrimary"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:elevation="8dp"
-        />
+        android:contentDescription="@string/stop_btn_content"/>
 
 </android.support.constraint.ConstraintLayout>

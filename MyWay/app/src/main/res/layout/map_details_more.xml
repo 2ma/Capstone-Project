@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:background="@android:color/white"
+    >
+
+    <TextView
+        android:id="@+id/avgSpeedTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/avgSpeed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/avgMovingSpeedTitle"/>
+
+    <TextView
+        android:id="@+id/avgSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/speed_default"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/avgMovingSpeed"
+        tools:text="37km/h"/>
+
+    <TextView
+        android:id="@+id/avgMovingSpeedTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/avg_moving_speed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avgSpeedTitle"
+
+        app:layout_constraintBottom_toTopOf="@+id/maxAltitudeTitle"/>
+
+    <TextView
+        android:id="@+id/avgMovingSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/speed_default"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avgSpeed"
+        app:layout_constraintBottom_toTopOf="@+id/maxAltitude"
+        tools:text="17km/h"/>
+
+    <TextView
+        android:id="@+id/maxAltitudeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/maxAltitude"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avgMovingSpeedTitle"
+        app:layout_constraintBottom_toTopOf="@+id/minAltitudeTitle"
+        />
+
+    <TextView
+        android:id="@+id/maxAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/altitude_default"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avgMovingSpeed"
+        app:layout_constraintBottom_toTopOf="@+id/minAltitude"
+        tools:text="50m"/>
+
+    <TextView
+        android:id="@+id/minAltitudeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/minAltitude"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxAltitudeTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/minAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/altitude_default"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxAltitude"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="10m"/>
+</android.support.constraint.ConstraintLayout>
