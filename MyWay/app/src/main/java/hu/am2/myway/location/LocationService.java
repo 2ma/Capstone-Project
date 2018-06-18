@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -69,6 +70,9 @@ public class LocationService extends Service implements SharedPreferences.OnShar
 
     private MutableLiveData<Location> lastLocation = new MutableLiveData<>();
 
+    private PowerManager.WakeLock wakeLock;
+
+    private static final String WAKE_LOCK_TAG = "hum.am2.myway:locationservice";
 
     @Inject
     AppExecutors executors;
@@ -79,6 +83,10 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         AndroidInjection.inject(this);
 
         Timber.d("onCreate: Service");
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -182,12 +190,16 @@ public class LocationService extends Service implements SharedPreferences.OnShar
             startForeground(NOTIFICATION_ID, wayRecorder.getNotification(this));
             wayRecorder.startWayRecording();
             startUiTimer();
+            wakeLock.acquire();
 
         } else {
             Timber.d("Pausing recording from service");
             wayRecorder.pauseWayRecording();
             stopForeground(true);
             stopSelf();
+            if (wakeLock.isHeld()) {
+                wakeLock.release();
+            }
         }
     }
 
@@ -213,6 +225,9 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         handler.removeCallbacksAndMessages(null);
         looper.quit();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         Timber.d("<--DESTROY-->");
     }
 
@@ -220,6 +235,10 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         executors.getServiceExecutor().execute(() -> wayRecorder.stopWayRecording());
         stopForeground(true);
         stopSelf();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
+
     }
 
     public int getRecordingState() {
@@ -244,14 +263,12 @@ public class LocationService extends Service implements SharedPreferences.OnShar
             wayRecorder.updateTime();
             wayRecorder.updateWidget();
             if (wayRecorder.getState() == STATE_RECORDING) {
-                handler.postDelayed(this, 500);
+                handler.postDelayed(this, 1000);
             }
         }
     };
 
     private void startUiTimer() {
-        handler.postDelayed(timeUpdater, 500);
+        handler.postDelayed(timeUpdater, 1000);
     }
-
-    //TODO WAKE LOCK
 }
