@@ -27,6 +27,9 @@ public interface WayDao {
     @Query("SELECT * FROM way")
     List<Way> getAllWays();
 
+    @Query("SELECT * FROM way WHERE wayName LIKE '%' || :query || '%'")
+    LiveData<List<Way>> getAllWaysForQuery(String query);
+
     @Query("SELECT * FROM way")
     LiveData<List<Way>> getAllWaysAsync();
 

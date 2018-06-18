@@ -13,11 +13,13 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import hu.am2.myway.LiveDataTestUtil;
 import hu.am2.myway.data.database.MyWayDatabase;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayPoint;
 import hu.am2.myway.location.model.WayWithWayPoints;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -66,6 +68,24 @@ public class WayDaoTest {
     }
 
     @Test
+    public void getWayLiveDataForIdTest() {
+        Way w = new Way();
+        w.setStartTime(3);
+        w.setEndTime(4);
+        w.setTotalDistance(45.3f);
+        w.setWayName("lovely way");
+        long id = wayDao.insertWay(w);
+
+        Way way = LiveDataTestUtil.getValue(wayDao.getWayLiveDataForId(id));
+
+        assertNotNull(way);
+        assertThat(way.getStartTime(), is(3L));
+        assertThat(way.getEndTime(), is(4L));
+        assertThat(way.getTotalDistance(), is(45.3f));
+        assertThat(way.getWayName(), is("lovely way"));
+    }
+
+    @Test
     public void getAllWaysTest() {
         for (int i = 0; i < 10; i++) {
             Way w = new Way();
@@ -76,6 +96,47 @@ public class WayDaoTest {
         }
 
         List<Way> result = wayDao.getAllWays();
+
+        assertThat(result.size(), is(10));
+    }
+
+    @Test
+    public void getAllWaysForQueryTest() {
+        for (int i = 0; i < 10; i++) {
+            Way w = new Way();
+            w.setStartTime(i);
+            w.setEndTime(i + 10);
+            w.setWayName("very lovely" + i);
+            w.setTotalDistance(45.3f + i);
+            wayDao.insertWay(w);
+            Way w2 = new Way();
+            w2.setStartTime(i);
+            w2.setEndTime(i + 10);
+            w2.setWayName("just a way" + i);
+            w2.setTotalDistance(45.3f + i);
+            wayDao.insertWay(w2);
+        }
+
+        List<Way> result = wayDao.getAllWaysForQuery("lovely");
+
+        assertThat(result.size(), is(10));
+        for (Way rWay : result) {
+            assertThat(rWay.getWayName(), containsString("lovely"));
+        }
+    }
+
+    @Test
+    public void getAllWaysAsyncTest() {
+        for (int i = 0; i < 10; i++) {
+            Way w = new Way();
+            w.setStartTime(i);
+            w.setEndTime(i + 10);
+            w.setTotalDistance(45.3f + i);
+            w.setWayName("lovely way" + i);
+            wayDao.insertWay(w);
+        }
+
+        List<Way> result = LiveDataTestUtil.getValue(wayDao.getAllWaysAsync());
 
         assertThat(result.size(), is(10));
     }
@@ -105,6 +166,34 @@ public class WayDaoTest {
         assertThat(result.getWayPoints().size(), is(15));
 
     }
+
+    @Test
+    public void getWayWithWayPointsLiveDataForIdTest() {
+        long[] id = new long[2];
+        for (int i = 0; i < 2; i++) {
+            Way w = new Way();
+            w.setStartTime(i);
+            w.setEndTime(i + 10);
+            w.setTotalDistance(45.3f + i);
+            id[i] = wayDao.insertWay(w);
+        }
+        for (int i = 0; i < 30; i++) {
+            WayPoint wayPoint = new WayPoint();
+            wayPoint.setWayId(i % 2 == 0 ? id[0] : id[1]);
+            wayPoint.setLongitude(i + 10L);
+            wayPoint.setLatitude(i + 20L);
+            wayDao.insertWayPoint(wayPoint);
+        }
+
+        WayWithWayPoints result = LiveDataTestUtil.getValue(wayDao.getWayWithWayPointsLiveDataForId(id[0]));
+
+        assertNotNull(result);
+        assertThat(result.getWay().getId(), is(id[0]));
+        assertThat(result.getWayPoints().size(), is(15));
+
+    }
+
+
 
     @Test
     public void wayPointCascadeDeleteTest() {

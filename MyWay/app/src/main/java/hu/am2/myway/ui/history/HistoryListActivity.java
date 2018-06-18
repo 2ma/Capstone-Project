@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -70,6 +71,27 @@ public class HistoryListActivity extends AppCompatActivity implements HistoryAda
                 viewModel.deleteWay(way);
             }
         };
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.trim().length() > 0) {
+                    viewModel.searchHistory(query);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)) {
+                    viewModel.searchHistory("");
+                }
+                return false;
+            }
+        });
+
+
+
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(historyList);
 

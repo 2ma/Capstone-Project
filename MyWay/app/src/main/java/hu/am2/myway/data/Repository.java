@@ -65,4 +65,8 @@ public class Repository {
     public void insertWayPoint(WayPoint wayPoint) {
         executors.getDiskIO().execute(() -> wayDao.insertWayPoint(wayPoint));
     }
+
+    public LiveData<List<Way>> getWaysForQuery(String query) {
+        return wayDao.getAllWaysForQuery(query);
+    }
 }
