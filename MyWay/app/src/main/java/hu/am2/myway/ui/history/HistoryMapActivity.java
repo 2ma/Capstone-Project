@@ -4,8 +4,12 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +44,23 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private Marker startPoint;
     private Marker endPoint;
 
+    //details pager layout 1
+    TextView speedText;
+    TextView timeText;
+    TextView distanceText;
+
+    //details pager layout 2
+    TextView avgSpeed;
+    TextView avgMovingSpeed;
+    TextView maxAltitude;
+    TextView minAltitude;
+
+    @BindView(R.id.tabDots)
+    TabLayout tabLayout;
+
+    @BindView(R.id.detailViewPager)
+    ViewPager detailViewPager;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -63,10 +84,32 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        setupDetailsPager();
+
         viewModel = ViewModelProviders.of(this, factory).get(HistoryMapViewModel.class);
 
         long id = getIntent().getLongExtra(Constants.EXTRA_WAY_ID, -1);
         viewModel.setWayId(id);
+    }
+
+    private void setupDetailsPager() {
+        View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
+        speedText = layoutOne.findViewById(R.id.speed);
+        timeText = layoutOne.findViewById(R.id.time);
+        distanceText = layoutOne.findViewById(R.id.distance);
+
+        View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
+        avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
+        avgMovingSpeed = layoutTwo.findViewById(R.id.avgMovingSpeed);
+        maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
+        minAltitude = layoutTwo.findViewById(R.id.minAltitude);
+
+        DetailsPagerAdapter detailsPagerAdapter = new DetailsPagerAdapter();
+        detailsPagerAdapter.addLayout(layoutOne);
+        detailsPagerAdapter.addLayout(layoutTwo);
+
+        detailViewPager.setAdapter(detailsPagerAdapter);
+        tabLayout.setupWithViewPager(detailViewPager, true);
     }
 
     @Override
@@ -113,6 +156,10 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
             }
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 100));
         }
-        //TODO setup data
+        distanceText.setText(getString(R.string.distance_unit, way.getTotalDistance()));
+        avgSpeed.setText(getString(R.string.speed_unit, way.getAvgSpeed()));
+        avgMovingSpeed.setText(getString(R.string.speed_unit, way.getAvgMovingSpeed()));
+        maxAltitude.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
+        minAltitude.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
     }
 }

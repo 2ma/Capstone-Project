@@ -117,7 +117,7 @@ public class WayDaoTest {
             wayDao.insertWay(w2);
         }
 
-        List<Way> result = wayDao.getAllWaysForQuery("lovely");
+        List<Way> result = LiveDataTestUtil.getValue(wayDao.getAllWaysForQuery("lovely"));
 
         assertThat(result.size(), is(10));
         for (Way rWay : result) {

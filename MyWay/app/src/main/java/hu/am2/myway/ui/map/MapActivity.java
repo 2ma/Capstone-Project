@@ -55,11 +55,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap map;
 
-    private LocationService locationService = null;
+    private LocationService locationService;
 
-    private Polyline path = null;
-    private Marker currentMarker = null;
-    private Circle circle = null;
+    private Polyline path;
+    private Marker currentMarker;
+    private Circle circle;
 
     private boolean bound = false;
 
@@ -265,7 +265,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             path = null;
         }
 
-        //TODO display other stats
         avgSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgSpeed()));
         avgMovingSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgMovingSpeed()));
         maxAltitude.setText(getString(R.string.altitude_unit, wayModel.getMaxAltitude()));
