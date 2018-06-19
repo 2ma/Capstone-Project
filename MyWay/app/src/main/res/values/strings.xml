@@ -60,5 +60,6 @@
     <string name="widget_distance_text">Distance:</string>
     <string name="search">Search…</string>
     <string name="gps_disabled">The gps is disabled, would you like to turn it on?</string>
+    <string name="waiting_for_signal">Waiting for signal…</string>
 
 </resources>

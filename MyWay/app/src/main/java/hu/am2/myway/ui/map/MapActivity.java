@@ -83,6 +83,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @BindView(R.id.detailViewPager)
     ViewPager detailViewPager;
 
+    @BindView(R.id.waitingForSignal)
+    TextView waytingForSignal;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -132,7 +135,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void handleState(Integer state) {
         playPauseButtonState(state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_WAITING_FOR_SIGNAL);
-        //TODO visibility for accuracy ui element
+        waytingForSignal.setVisibility(state == WayRecorder.STATE_WAITING_FOR_SIGNAL ? View.VISIBLE : View.GONE);
     }
 
     private void updateElapsedTime(Long time) {

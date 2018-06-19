@@ -66,7 +66,6 @@ public class WayStatus {
             totalDistance += currentLocation.distanceTo(lastLocation);
             long lastLocationTime = TimeUnit.NANOSECONDS.toMillis(lastLocation.getElapsedRealtimeNanos());
             way.setTotalDistance(totalDistance);
-            //TODO handle if last location was loaded from preferences
             if (currentLocation.hasSpeed() || lastLocationTime != 0) {
                 long t = currentTime - lastLocationTime;
                 way.setMovingTime(movingTime + Math.max(0, t));

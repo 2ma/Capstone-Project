@@ -9,4 +9,5 @@
     <color name="pressed_ripple">#8BC34A</color>
     <color name="white">#ffffff</color>
     <color name="delete_red">#f44336</color>
+    <color name="signal_background">#FFD933</color>
 </resources>
