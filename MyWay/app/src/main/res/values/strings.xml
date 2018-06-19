@@ -59,5 +59,6 @@
     <string name="widget_time_text">Time:</string>
     <string name="widget_distance_text">Distance:</string>
     <string name="search">Search…</string>
+    <string name="gps_disabled">The gps is disabled, would you like to turn it on?</string>
 
 </resources>

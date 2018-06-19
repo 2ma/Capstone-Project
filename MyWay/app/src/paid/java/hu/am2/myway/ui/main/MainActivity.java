@@ -49,9 +49,29 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 14);
             return;
         }
-        //TODO advise to turn on gps if it's off
-        //TODO check if startPauseRecording, launch MapActivity
+        try {
+            int gps = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+            if (gps == Settings.Secure.LOCATION_MODE_OFF) {
+                showLocationDialog();
+                return;
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
         resumeActiveRecording();
+    }
+
+    private void showLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.gps_disabled);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            Intent gpsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(gpsIntent);
+        });
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+
+        });
+        builder.create().show();
     }
 
     @Override
@@ -59,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 14 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             resumeActiveRecording();
         } else {
-            //TODO handle missing permission differently?
             Toast.makeText(this, R.string.permission_required, Toast.LENGTH_SHORT).show();
             finish();
         }
