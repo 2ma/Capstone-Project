@@ -36,6 +36,19 @@ android {
         }
     }
 
+    flavorDimensions "dimen"
+
+    productFlavors {
+        free {
+            applicationIdSuffix '.free'
+            dimension "dimen"
+        }
+
+        paid {
+            dimension "dimen"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -84,6 +97,9 @@ dependencies {
 
     //test
     testImplementation "junit:junit:$junit"
+
+    //ad implementation for free version
+    freeImplementation "com.google.android.gms:play-services-ads:$playServices"
 
     //instrument test
     androidTestImplementation "com.android.support.test:runner:$runner"
