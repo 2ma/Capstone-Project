@@ -26,5 +26,13 @@
         android:title="@string/gps_accuracy_title"
         android:summary="@string/gps_accuracy_summary"
         />
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/map_type"
+        android:entryValues="@array/map_type_values"
+        android:key="@string/map_type_key"
+        android:title="@string/map_type_title"
+        android:summary="@string/map_type_summary"
+        />
 
 </PreferenceScreen>

@@ -1,6 +1,7 @@
 package hu.am2.myway.ui.map;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -53,6 +55,7 @@ import hu.am2.myway.ui.history.DetailsPagerAdapter;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final String MAP_TYPE = "MAP_TYPE";
     private GoogleMap map;
 
     private LocationService locationService;
@@ -62,6 +65,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Circle circle;
 
     private boolean bound = false;
+
+    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
     @BindView(R.id.startPauseBtn)
     ImageButton startPauseBtn;
@@ -152,12 +157,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        if (savedInstanceState != null) {
+            mapType = savedInstanceState.getInt(MAP_TYPE);
+        } else {
+            String m = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.map_type_key), "");
+            mapType = m.length() > 0 ? Integer.valueOf(m) : GoogleMap.MAP_TYPE_NORMAL;
+        }
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         setupDetailsPager();
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(MAP_TYPE, mapType);
+        super.onSaveInstanceState(outState);
     }
 
     private void setupDetailsPager() {
@@ -187,11 +204,44 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (stopRecordingDialog()) return true;
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                if (stopRecordingDialog()) {
+                    return true;
+                } else return super.onOptionsItemSelected(item);
+            }
+            case R.id.menu_map_normal: {
+                mapType = GoogleMap.MAP_TYPE_NORMAL;
+                break;
+            }
+            case R.id.menu_map_hybrid: {
+                mapType = GoogleMap.MAP_TYPE_HYBRID;
+                break;
+            }
+            case R.id.menu_map_satellite: {
+                mapType = GoogleMap.MAP_TYPE_SATELLITE;
+                break;
+            }
+            case R.id.menu_map_terrain: {
+                mapType = GoogleMap.MAP_TYPE_TERRAIN;
+                break;
+            }
+            default:
+                super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
+        if (map != null) {
+            map.setMapType(mapType);
+        }
+
+        return true;
     }
 
     private boolean stopRecordingDialog() {
@@ -245,7 +295,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (state) {
             startPauseBtn.setImageResource(R.drawable.ic_pause_black_24dp);
         } else {
-            startPauseBtn.setImageResource(R.drawable.ic_fiber_manual_record_black_24dp);
+            startPauseBtn.setImageResource(R.drawable.ic_record_24dp);
         }
     }
 
@@ -364,10 +414,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-
+        map.setMyLocationEnabled(true);
+        map.setMapType(mapType);
         // Add a marker in Sydney and move the camera
         /*LatLng sydney = new LatLng(-34, 151);
         map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));

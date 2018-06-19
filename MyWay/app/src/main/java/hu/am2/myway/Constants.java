@@ -2,9 +2,6 @@ package hu.am2.myway;
 
 public final class Constants {
 
-    public static final String PREF_TIME_INTERVAL = "PREF_TIME_INTERVAL";
-    public static final String PREF_DISTANCE_INTERVAL = "PREF_DISTANCE_INTERVAL";
-    public static final String PREF_GPS_ACCURACY = "PREF_GPS_ACCURACY";
     public static final String PREF_RECORDING_STATE = "PREF_RECORDING_STATE";
     public static final String PREF_WAY_ID = "PREF_WAY_ID";
     public static final String ACTION_START_PAUSE_RECORDING = "hu.am2.myway.constants.ACTION_START_PAUSE_RECORDING";

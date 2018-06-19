@@ -71,10 +71,12 @@ public class WayRecorder {
     private int distanceInterval;
     private int gpsAccuracy;
 
+    private final String timeKey;
+    private final String distanceKey;
+    private final String gpsKey;
+
     //TODO check if needed
     private volatile WayStatus wayStatus;
-
-
 
 
     @Inject
@@ -87,6 +89,9 @@ public class WayRecorder {
         executors = appExecutors;
         appWidgetManager = AppWidgetManager.getInstance(application);
         appWidgetComponent = new ComponentName(application, MyWayWidget.class);
+        timeKey = application.getString(R.string.recording_time_interval_key);
+        distanceKey = application.getString(R.string.recording_distance_interval_key);
+        gpsKey = application.getString(R.string.gps_accuracy_key);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
@@ -103,27 +108,26 @@ public class WayRecorder {
 
     void loadPreferences() {
         //default value is 1s
-        timeInterval = sharedPreferences.getInt(Constants.PREF_TIME_INTERVAL, 1000);
+        String t = sharedPreferences.getString(timeKey, "");
+        timeInterval = t.length() > 0 ? Integer.valueOf(t) : 1000;
         //default value is 10meters
-        distanceInterval = sharedPreferences.getInt(Constants.PREF_DISTANCE_INTERVAL, 10);
+        String d = sharedPreferences.getString(distanceKey, "");
+        distanceInterval = d.length() > 0 ? Integer.valueOf(d) : 10;
         //default value is 50meters
-        gpsAccuracy = sharedPreferences.getInt(Constants.PREF_GPS_ACCURACY, 50);
+        String g = sharedPreferences.getString(gpsKey, "");
+        gpsAccuracy = g.length() > 0 ? Integer.valueOf(g) : 50;
     }
 
     void preferenceChanged(String key) {
-        switch (key) {
-            case Constants.PREF_DISTANCE_INTERVAL: {
-                distanceInterval = sharedPreferences.getInt(Constants.PREF_DISTANCE_INTERVAL, 10);
-                break;
-            }
-            case Constants.PREF_TIME_INTERVAL: {
-                timeInterval = sharedPreferences.getInt(Constants.PREF_TIME_INTERVAL, 1000);
-                break;
-            }
-            case Constants.PREF_GPS_ACCURACY: {
-                gpsAccuracy = sharedPreferences.getInt(Constants.PREF_GPS_ACCURACY, 50);
-                break;
-            }
+        if (timeKey.equals(key)) {
+            String t = sharedPreferences.getString(timeKey, "");
+            timeInterval = t.length() > 0 ? Integer.valueOf(t) : 1000;
+        } else if (distanceKey.equals(key)) {
+            String d = sharedPreferences.getString(distanceKey, "");
+            distanceInterval = d.length() > 0 ? Integer.valueOf(d) : 10;
+        } else if (gpsKey.equals(key)) {
+            String g = sharedPreferences.getString(gpsKey, "");
+            gpsAccuracy = g.length() > 0 ? Integer.valueOf(g) : 50;
         }
     }
 
