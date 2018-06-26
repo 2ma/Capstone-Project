@@ -6,7 +6,6 @@
     <color name="circleBackground">#603F51B5</color>
     <color name="circleLine">#3F51B5</color>
     <color name="lightBlack">#80000000</color>
-    <color name="pressed_ripple">#8BC34A</color>
     <color name="white">#ffffff</color>
     <color name="delete_red">#f44336</color>
     <color name="signal_background">#FFD933</color>

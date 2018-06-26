@@ -7,23 +7,32 @@ import java.util.List;
 public class WayUiModel {
 
     private final long totalTime;
+    //in km
     private final float totalDistance;
-    private final float avSpeed;
-    private final float avgMovingSpeed;
+    //in km/h
+    private final float avgSpeed;
+    //max speed
+    private final float maxSpeed;
+    //in meter
     private final double maxAltitude;
+    //in meter
     private final double minAltitude;
+
 
     private final List<LatLng> wayPoints;
 
     public WayUiModel(Way way, List<LatLng> wayPoints) {
         this.totalTime = way.getTotalTime();
-        this.totalDistance = way.getTotalDistance();
-        this.avSpeed = way.getAvgSpeed();
-        this.avgMovingSpeed = way.getAvgMovingSpeed();
+        this.totalDistance = way.getTotalDistance() / 1000;
+        this.avgSpeed = way.getAvgSpeed() * 3.6f;
         this.maxAltitude = way.getMaxAltitude();
         this.minAltitude = way.getMinAltitude();
         this.wayPoints = wayPoints;
+        this.maxSpeed = way.getMaxSpeed();
+    }
 
+    public float getMaxSpeed() {
+        return maxSpeed;
     }
 
     public long getTotalTime() {
@@ -35,11 +44,7 @@ public class WayUiModel {
     }
 
     public float getAvgSpeed() {
-        return avSpeed;
-    }
-
-    public float getAvgMovingSpeed() {
-        return avgMovingSpeed;
+        return avgSpeed;
     }
 
     public double getMaxAltitude() {

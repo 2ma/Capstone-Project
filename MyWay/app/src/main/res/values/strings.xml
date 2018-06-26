@@ -1,24 +1,20 @@
 <resources>
     <string name="app_name">MyWay</string>
-    <string name="title_activity_map">Map</string>
-    <string name="missing_permission">Requires location permission</string>
 
     <string name="speed">Speed:</string>
     <string name="time">Time:</string>
     <string name="distance">Distance:</string>
-    <string name="avgSpeed">Avg. speed:</string>
-    <string name="avg_moving_speed">Avg. moving speed:</string>
-    <string name="maxAltitude">Max. alt.:</string>
-    <string name="minAltitude">Min. alt.:</string>
-    <string name="distance_unit">%.1f m</string>
+    <string name="avg_speed">Avg. speed:</string>
+    <string name="max_speed">Max. speed:</string>
+    <string name="max_altitude">Max. alt.:</string>
+    <string name="min_altitude">Min. alt.:</string>
+    <string name="distance_unit">%.1f km</string>
     <string name="altitude_unit">%.1f m</string>
     <string name="speed_unit">%.1f km/h</string>
     <string name="speed_default">0.0 km/h</string>
     <string name="time_default">0:00:00</string>
-    <string name="distance_default">0 m</string>
+    <string name="distance_default">0.0 km</string>
     <string name="altitude_default">0 m</string>
-
-    <string name="save_way">Save way</string>
 
     <string name="recording_time_interval_key">record_time_interval</string>
     <string name="recording_time_interval_title">Recording time interval</string>
@@ -33,9 +29,6 @@
     <string name="map_type_title">Map type</string>
     <string name="map_type_summary">Default map type: %s</string>
 
-    <string name="settings">Settings</string>
-    <string name="menu_new">New</string>
-    <string name="menu_history">History</string>
     <string name="new_way_button">New Way</string>
     <string name="history_button">History</string>
     <string name="settings_button">Settings</string>
@@ -44,9 +37,6 @@
     <string name="cancel">Cancel</string>
 
     <string name="no_history">No history</string>
-    <string name="menu_map">Map</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
     <string name="time_content">Time length for way</string>
     <string name="distance_content">Distance for way</string>
     <string name="record_pause_btn_content">Play and Pause button</string>
@@ -56,8 +46,6 @@
     <string name="recording_notification">MyWay is recording you location</string>
     <string name="pause_notification">Pause</string>
     <string name="stop_notification">Stop</string>
-    <string name="record">Record</string>
-    <string name="stop">Stop</string>
     <string name="permission_required">App can\'t function without the permission</string>
     <string name="widget_time_text">Time:</string>
     <string name="widget_distance_text">Distance:</string>

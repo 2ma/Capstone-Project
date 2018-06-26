@@ -27,7 +27,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${google_maps_key}"/>
 
-        <activity android:name=".ui.main.MainActivity">
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:theme="@style/NoBackground">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

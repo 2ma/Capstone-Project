@@ -13,12 +13,44 @@ public class Way {
     private long endTime;
     private float totalDistance;
     private float avgSpeed;
-    private float avgMovingSpeed;
     private float maxSpeed;
     private double maxAltitude;
     private double minAltitude;
     @PrimaryKey(autoGenerate = true)
     private long id;
+
+    public Way() {
+    }
+
+    public Way getWayCopy() {
+        return new Way(
+            wayName,
+            totalTime,
+            movingTime,
+            startTime,
+            endTime,
+            totalDistance,
+            avgSpeed,
+            maxSpeed,
+            maxAltitude,
+            minAltitude,
+            id);
+    }
+
+    private Way(String wayName, long totalTime, long movingTime, long startTime, long endTime, float totalDistance, float avgSpeed, float maxSpeed,
+                double maxAltitude, double minAltitude, long id) {
+        this.wayName = wayName;
+        this.totalTime = totalTime;
+        this.movingTime = movingTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.totalDistance = totalDistance;
+        this.avgSpeed = avgSpeed;
+        this.maxSpeed = maxSpeed;
+        this.maxAltitude = maxAltitude;
+        this.minAltitude = minAltitude;
+        this.id = id;
+    }
 
     public long getId() {
         return id;
@@ -67,14 +99,6 @@ public class Way {
 
     public void setAvgSpeed(float avgSpeed) {
         this.avgSpeed = avgSpeed;
-    }
-
-    public float getAvgMovingSpeed() {
-        return avgMovingSpeed;
-    }
-
-    public void setAvgMovingSpeed(float avgMovingSpeed) {
-        this.avgMovingSpeed = avgMovingSpeed;
     }
 
     public float getMaxSpeed() {

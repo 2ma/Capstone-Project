@@ -2,6 +2,8 @@ package hu.am2.myway.ui.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +23,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,9 +45,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.android.AndroidInjection;
 import hu.am2.myway.Constants;
 import hu.am2.myway.R;
 import hu.am2.myway.Utils;
@@ -56,6 +62,7 @@ import hu.am2.myway.ui.history.DetailsPagerAdapter;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String MAP_TYPE = "MAP_TYPE";
+    private static final String TAG = MapActivity.class.getSimpleName();
     private GoogleMap map;
 
     private LocationService locationService;
@@ -75,37 +82,43 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     TabLayout tabLayout;
 
     //details pager layout 1
-    TextView speedText;
-    TextView timeText;
-    TextView distanceText;
+    private TextView speedText;
+    private TextView timeText;
+    private TextView distanceText;
 
     //details pager layout 2
-    TextView avgSpeed;
-    TextView avgMovingSpeed;
-    TextView maxAltitude;
-    TextView minAltitude;
+    private TextView avgSpeed;
+    private TextView maxSpeed;
+    private TextView maxAltitude;
+    private TextView minAltitude;
 
     @BindView(R.id.detailViewPager)
     ViewPager detailViewPager;
 
     @BindView(R.id.waitingForSignal)
-    TextView waytingForSignal;
+    TextView waitingForSignal;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    @Inject
+    ViewModelProvider.Factory factory;
+
+    private MapViewModel viewModel;
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             locationService = ((LocationService.ServiceBinder) service).getService();
-            locationService.getWayUiModelLiveData().observe(MapActivity.this, wayModel -> {
+            /*locationService.getWayUiModelLiveData().observe(MapActivity.this, wayModel -> {
                 if (wayModel != null) {
                     handleWayUiModel(wayModel);
                 } else {
                     clearUi();
                 }
-            });
-            locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
+            });*/
+            //locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
+            locationService.getTotalTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
             locationService.getStateLiveData().observe(MapActivity.this, state -> handleState(state));
             locationService.getLocationLiveData().observe(MapActivity.this, location -> handleLocation(location));
             bound = true;
@@ -119,36 +132,42 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     };
 
     private void handleLocation(Location location) {
-        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-        speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
-        if (currentMarker == null) {
-            currentMarker = map.addMarker(new MarkerOptions().position(pos));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
-        } else {
-            currentMarker.setPosition(pos);
-            map.animateCamera(CameraUpdateFactory.newLatLng(pos));
-        }
-        if (circle == null) {
-            circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
-                .fillColor(R.color.circleBackground)
-                .strokeColor(R.color.circleLine)
-                .strokeWidth(1));
-        } else {
-            circle.setCenter(pos);
+        if (location != null) {
+            LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+            //location speed is in m/s
+            speedText.setText(getString(R.string.speed_unit, location.getSpeed() * 3.6f));
+            if (currentMarker == null) {
+                currentMarker = map.addMarker(new MarkerOptions().position(pos));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
+            } else {
+                currentMarker.setPosition(pos);
+                map.animateCamera(CameraUpdateFactory.newLatLng(pos));
+            }
+            if (circle == null) {
+                circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
+                    .fillColor(R.color.circleBackground)
+                    .strokeColor(R.color.circleLine)
+                    .strokeWidth(1));
+            } else {
+                circle.setCenter(pos);
+            }
         }
     }
 
     private void handleState(Integer state) {
         playPauseButtonState(state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_WAITING_FOR_SIGNAL);
-        waytingForSignal.setVisibility(state == WayRecorder.STATE_WAITING_FOR_SIGNAL ? View.VISIBLE : View.GONE);
+        waitingForSignal.setVisibility(state == WayRecorder.STATE_WAITING_FOR_SIGNAL ? View.VISIBLE : View.GONE);
     }
 
     private void updateElapsedTime(Long time) {
-        timeText.setText(Utils.getTimeFromMilliseconds(time));
+        String t = Utils.getTimeFromMilliseconds(time);
+        Log.d(TAG, "Update time: " + t);
+        timeText.setText(t);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
@@ -169,6 +188,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         setupDetailsPager();
+        //TODO map could be null when observing
+        viewModel = ViewModelProviders.of(this, factory).get(MapViewModel.class);
+        viewModel.getWayUiModelLiveData().observe(this, this::handleWayUiModel);
     }
 
     @Override
@@ -185,7 +207,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
         avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
-        avgMovingSpeed = layoutTwo.findViewById(R.id.avgMovingSpeed);
+        maxSpeed = layoutTwo.findViewById(R.id.maxSpeed);
         maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
         minAltitude = layoutTwo.findViewById(R.id.minAltitude);
 
@@ -268,7 +290,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         distanceText.setText(R.string.distance_default);
 
         avgSpeed.setText(R.string.speed_default);
-        avgMovingSpeed.setText(R.string.speed_default);
+        maxSpeed.setText(R.string.speed_default);
         maxAltitude.setText(R.string.altitude_default);
         minAltitude.setText(R.string.altitude_default);
 
@@ -308,7 +330,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void handleWayUiModel(WayUiModel wayModel) {
-
+        if (wayModel == null) {
+            clearUi();
+            return;
+        }
+        //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
         distanceText.setText(getString(R.string.distance_unit, wayModel.getTotalDistance()));
         showWayPath(wayModel.getWayPoints());
         if (wayModel.getWayPoints().size() > 0) {
@@ -319,7 +345,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         avgSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgSpeed()));
-        avgMovingSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgMovingSpeed()));
+        maxSpeed.setText(getString(R.string.speed_unit, wayModel.getMaxSpeed()));
         maxAltitude.setText(getString(R.string.altitude_unit, wayModel.getMaxAltitude()));
         minAltitude.setText(getString(R.string.altitude_unit, wayModel.getMinAltitude()));
 

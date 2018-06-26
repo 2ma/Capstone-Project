@@ -16,12 +16,12 @@ import hu.am2.myway.location.model.Way;
 
 public class HistoryListViewModel extends ViewModel {
 
-    private Repository repository;
-    private AppExecutors executors;
+    private final Repository repository;
+    private final AppExecutors executors;
 
-    private LiveData<List<Way>> ways;
+    private final LiveData<List<Way>> ways;
 
-    private MutableLiveData<String> query = new MutableLiveData<>();
+    private final MutableLiveData<String> query = new MutableLiveData<>();
 
     @Inject
     public HistoryListViewModel(Repository repository, AppExecutors executors) {

@@ -2,6 +2,8 @@ package hu.am2.myway.di;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import javax.inject.Singleton;
 
@@ -23,5 +25,10 @@ public class AppModule {
     @Singleton
     public WayDao providesWayDao(MyWayDatabase database) {
         return database.wayDao();
+    }
+
+    @Provides
+    SharedPreferences providesSharedPreferences(Application application) {
+        return PreferenceManager.getDefaultSharedPreferences(application);
     }
 }

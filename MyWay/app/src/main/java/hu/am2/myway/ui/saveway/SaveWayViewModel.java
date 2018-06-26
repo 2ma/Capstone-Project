@@ -13,11 +13,11 @@ import hu.am2.myway.location.model.Way;
 
 public class SaveWayViewModel extends ViewModel {
 
-    private Repository repository;
-    private AppExecutors appExecutors;
+    private final Repository repository;
+    private final AppExecutors appExecutors;
 
-    private LiveData<Way> way;
-    private MutableLiveData<Long> wayId = new MutableLiveData<>();
+    private final LiveData<Way> way;
+    private final MutableLiveData<Long> wayId = new MutableLiveData<>();
 
     @Inject
     public SaveWayViewModel(Repository repository, AppExecutors appExecutors) {

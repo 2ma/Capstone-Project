@@ -34,7 +34,7 @@ public interface WayDao {
     LiveData<List<Way>> getAllWaysAsync();
 
     @Transaction
-    @Query("SELECT * FROM way WHERE id=:id")
+    @Query("SELECT * FROM way LEFT JOIN way_point ON way_point.wayId = way.id WHERE way.id = :id ORDER BY way_point.id")
     WayWithWayPoints getWayWithWayPointsForId(long id);
 
     @Transaction
@@ -54,8 +54,11 @@ public interface WayDao {
     List<WayPoint> getAllWayPointsForWayId(long wayId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertWayPoint(WayPoint wayPoint);
+    long insertWayPoint(WayPoint wayPoint);
 
     @Query("DELETE FROM way_point WHERE wayId=:wayId")
     void deleteAllWayPointsForWayId(long wayId);
+
+    @Query("SELECT * FROM way_point WHERE wayId = :wayId ORDER BY id DESC LIMIT 1")
+    WayPoint getLastWayPointForWayId(long wayId);
 }

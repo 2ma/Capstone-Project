@@ -2,7 +2,9 @@ package hu.am2.myway.appwidget;
 
 public class WidgetStatus {
 
+    //in km
     private float distance;
+    //in ms
     private long time;
     private int state;
 

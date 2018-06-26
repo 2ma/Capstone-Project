@@ -18,7 +18,6 @@ import hu.am2.myway.R;
 import hu.am2.myway.Utils;
 import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.LocationService;
-import hu.am2.myway.location.WayRecorder;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.ui.main.MainActivity;
 
@@ -39,54 +38,56 @@ public class MyWayWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
     }
 
-    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, WidgetStatus status) {
+    public static void updateAppWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, WidgetStatus widgetStatus) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, status);
+            updateAppWidget(context, appWidgetManager, appWidgetId, widgetStatus);
         }
     }
 
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                        int appWidgetId, WidgetStatus status) {
+                                        int appWidgetId, WidgetStatus widgetStatus) {
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.my_way_widget);
-        if (status == null) {
-            defaultWidgetState(context, views);
-        } else if (status.getState() == STATE_STOP) {
-            defaultWidgetState(context, views);
+
+        if (widgetStatus != null) {
+            if (widgetStatus.getState() == STATE_STOP) {
+                defaultWidgetState(context, views, appWidgetManager, appWidgetId);
+            } else {
+                views.setTextViewText(R.id.widgetDistanceText, context.getString(R.string.distance_unit, widgetStatus.getDistance()));
+                views.setTextViewText(R.id.widgetTimeText, Utils.getTimeFromMilliseconds(widgetStatus.getTime()));
+
+                views.setImageViewResource(R.id.widgetRecordPauseBtn, widgetStatus.getState() == STATE_RECORDING ? R.drawable.ic_pause_png : R
+                    .drawable
+                    .ic_record_png);
+
+                Intent intentStartPause = new Intent(context, LocationService.class);
+                intentStartPause.setAction(Constants.ACTION_START_PAUSE_RECORDING);
+
+                PendingIntent pendingStartPause;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    pendingStartPause = PendingIntent.getForegroundService(context, 0, intentStartPause, PendingIntent.FLAG_UPDATE_CURRENT);
+                } else {
+                    pendingStartPause = PendingIntent.getService(context, 0, intentStartPause, PendingIntent.FLAG_UPDATE_CURRENT);
+                }
+                views.setOnClickPendingIntent(R.id.widgetRecordPauseBtn, pendingStartPause);
+
+                Intent intentStop = new Intent(context, LocationService.class);
+                intentStop.setAction(Constants.ACTION_STOP_RECORDING);
+                PendingIntent pendingStop;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    pendingStop = PendingIntent.getForegroundService(context, 0, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
+                } else {
+                    pendingStop = PendingIntent.getService(context, 0, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
+                }
+                views.setOnClickPendingIntent(R.id.widgetStopBtn, pendingStop);
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+            }
         } else {
-            views.setTextViewText(R.id.widgetDistanceText, context.getString(R.string.distance_unit, status.getDistance()));
-            views.setTextViewText(R.id.widgetTimeText, Utils.getTimeFromMilliseconds(status.getTime()));
-
-            views.setImageViewResource(R.id.widgetRecordPauseBtn, status.getState() == STATE_RECORDING ? R.drawable.ic_pause_png : R
-                .drawable
-                .ic_record_png);
-
-            Intent intentStartPause = new Intent(context, LocationService.class);
-            intentStartPause.setAction(Constants.ACTION_START_PAUSE_RECORDING);
-
-            PendingIntent pendingStartPause;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                pendingStartPause = PendingIntent.getForegroundService(context, 0, intentStartPause, PendingIntent.FLAG_UPDATE_CURRENT);
-            } else {
-                pendingStartPause = PendingIntent.getService(context, 0, intentStartPause, PendingIntent.FLAG_UPDATE_CURRENT);
-            }
-            views.setOnClickPendingIntent(R.id.widgetRecordPauseBtn, pendingStartPause);
-
-            Intent intentStop = new Intent(context, LocationService.class);
-            intentStop.setAction(Constants.ACTION_STOP_RECORDING);
-            PendingIntent pendingStop;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                pendingStop = PendingIntent.getForegroundService(context, 0, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
-            } else {
-                pendingStop = PendingIntent.getService(context, 0, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
-            }
-            views.setOnClickPendingIntent(R.id.widgetStopBtn, pendingStop);
-
+            defaultWidgetState(context, views, appWidgetManager, appWidgetId);
         }
-        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private static void defaultWidgetState(Context context, RemoteViews views) {
+    private static void defaultWidgetState(Context context, RemoteViews views, AppWidgetManager appWidgetManager, int appWidgetId) {
         views.setImageViewResource(R.id.widgetRecordPauseBtn, R.drawable.ic_record_png);
         views.setTextViewText(R.id.widgetDistanceText, context.getString(R.string.distance_default));
         views.setTextViewText(R.id.widgetTimeText, context.getString(R.string.time_default));
@@ -103,23 +104,22 @@ public class MyWayWidget extends AppWidgetProvider {
         PendingIntent pendingMain = PendingIntent.getActivity(context, 0, intentMain, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget, pendingMain);
         views.setOnClickPendingIntent(R.id.widgetRecordPauseBtn, pendingStart);
+        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        long id = sharedPreferences.getLong(Constants.PREF_WAY_ID, -1);
-        if (id != -1) {
+        long wayId = sharedPreferences.getLong(Constants.PREF_WAY_ID, -1);
+        if (wayId != -1) {
             executors.getDiskIO().execute(() -> {
-                int state = sharedPreferences.getInt(Constants.PREF_RECORDING_STATE, WayRecorder.STATE_STOP);
-                Way way = repository.getWayForId(id);
-                WidgetStatus widgetStatus = new WidgetStatus(way.getTotalDistance(), way.getTotalTime(), state);
-                updateAppWidget(context, appWidgetManager, appWidgetIds, widgetStatus);
+                Way way = repository.getWayForId(wayId);
+                updateAppWidgets(context, appWidgetManager, appWidgetIds, new WidgetStatus(way.getTotalDistance() / 1000, way.getTotalTime(),
+                    sharedPreferences.getInt(Constants.PREF_RECORDING_STATE, STATE_STOP)));
             });
         } else {
-            updateAppWidget(context, appWidgetManager, appWidgetIds, null);
+            updateAppWidgets(context, appWidgetManager, appWidgetIds, null);
         }
-
     }
 }
 

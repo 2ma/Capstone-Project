@@ -15,14 +15,13 @@ import hu.am2.myway.R;
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
     private final ColorDrawable background = new ColorDrawable();
-    private final int backColor;
     private final Drawable icon;
     private final int intrinsicWidth;
     private final int intrinsicHeight;
 
-    public SwipeToDeleteCallback(Context context) {
+    SwipeToDeleteCallback(Context context) {
         super(0, ItemTouchHelper.LEFT);
-        backColor = ContextCompat.getColor(context, R.color.delete_red);
+        int backColor = ContextCompat.getColor(context, R.color.delete_red);
         icon = ContextCompat.getDrawable(context, R.drawable.ic_delete_24dp);
         intrinsicWidth = icon.getIntrinsicWidth();
         intrinsicHeight = icon.getIntrinsicHeight();

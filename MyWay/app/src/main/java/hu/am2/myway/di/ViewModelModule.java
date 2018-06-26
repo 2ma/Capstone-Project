@@ -8,6 +8,7 @@ import dagger.Module;
 import dagger.multibindings.IntoMap;
 import hu.am2.myway.ui.history.HistoryListViewModel;
 import hu.am2.myway.ui.history.HistoryMapViewModel;
+import hu.am2.myway.ui.map.MapViewModel;
 import hu.am2.myway.ui.saveway.SaveWayViewModel;
 import hu.am2.myway.viewmodelfactory.MyWayViewModelFactory;
 
@@ -46,6 +47,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HistoryMapViewModel.class)
     abstract ViewModel bindHistoryMapViewModel(HistoryMapViewModel historyMapViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MapViewModel.class)
+    abstract ViewModel bindMapViewModel(MapViewModel mapViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(MyWayViewModelFactory factory);

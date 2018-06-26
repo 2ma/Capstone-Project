@@ -151,9 +151,9 @@ public class WayDaoTest {
             w.setTotalDistance(45.3f + i);
             id[i] = wayDao.insertWay(w);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 30; i > 0; i--) {
             WayPoint wayPoint = new WayPoint();
-            wayPoint.setWayId(i % 2 == 0 ? id[0] : id[1]);
+            wayPoint.setWayId(i % 2 == 1 ? id[1] : id[0]);
             wayPoint.setLongitude(i + 10L);
             wayPoint.setLatitude(i + 20L);
             wayDao.insertWayPoint(wayPoint);
@@ -163,7 +163,10 @@ public class WayDaoTest {
 
         assertNotNull(result);
         assertThat(result.getWay().getId(), is(id[0]));
-        assertThat(result.getWayPoints().size(), is(15));
+        List<WayPoint> wp = result.getWayPoints();
+        assertThat(wp.size(), is(15));
+        assertThat(wp.get(0).getId(), is(1L));
+        assertThat(wp.get(wp.size() - 1).getId(), is(29L));
 
     }
 
@@ -177,9 +180,9 @@ public class WayDaoTest {
             w.setTotalDistance(45.3f + i);
             id[i] = wayDao.insertWay(w);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 30; i > 0; i--) {
             WayPoint wayPoint = new WayPoint();
-            wayPoint.setWayId(i % 2 == 0 ? id[0] : id[1]);
+            wayPoint.setWayId(i % 2 == 1 ? id[1] : id[0]);
             wayPoint.setLongitude(i + 10L);
             wayPoint.setLatitude(i + 20L);
             wayDao.insertWayPoint(wayPoint);
@@ -189,8 +192,10 @@ public class WayDaoTest {
 
         assertNotNull(result);
         assertThat(result.getWay().getId(), is(id[0]));
-        assertThat(result.getWayPoints().size(), is(15));
-
+        List<WayPoint> wp = result.getWayPoints();
+        assertThat(wp.size(), is(15));
+        assertThat(wp.get(0).getId(), is(1L));
+        assertThat(wp.get(wp.size() - 1).getId(), is(29L));
     }
 
 
@@ -309,5 +314,40 @@ public class WayDaoTest {
         List<WayPoint> result = wayDao.getAllWayPointsForWayId(3);
 
         assertThat(result.size(), is(0));
+    }
+
+    @Test
+    public void getLastWayPointForWayIdTest() {
+        long[] id = new long[2];
+        for (int i = 0; i < 2; i++) {
+            Way w = new Way();
+            w.setStartTime(i);
+            w.setEndTime(i + 10);
+            w.setTotalDistance(45.3f + i);
+            id[i] = wayDao.insertWay(w);
+        }
+        for (int i = 0; i < 30; i++) {
+            WayPoint wayPoint = new WayPoint();
+            wayPoint.setWayId(i % 2 == 1 ? id[1] : id[0]);
+            wayPoint.setLongitude(i + 10L);
+            wayPoint.setLatitude(i + 20L);
+            wayDao.insertWayPoint(wayPoint);
+        }
+
+        WayPoint wayPoint = new WayPoint();
+        wayPoint.setWayId(id[0]);
+        wayPoint.setLatitude(100);
+        wayPoint.setLongitude(200);
+
+        long wId = wayDao.insertWayPoint(wayPoint);
+
+        WayPoint result = wayDao.getLastWayPointForWayId(id[0]);
+
+        assertNotNull(result);
+        assertThat(result.getWayId(), is(id[0]));
+        assertThat(result.getId(), is(wId));
+        assertThat(result.getLatitude(), is(100.0));
+        assertThat(result.getLongitude(), is(200.0));
+
     }
 }

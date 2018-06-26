@@ -7,22 +7,19 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class WayStatus {
 
     private Location lastLocation;
-    private long lastStartTime = -1;
+    private long lastRecordedTime = -1;
 
     private Way way;
-    private List<LatLng> wayPoints = new ArrayList<>();
-
-    private static final String TAG = "WayStatus";
+    private final List<LatLng> wayPoints = new ArrayList<>();
 
     public WayStatus() {
     }
 
-    public WayStatus(WayWithWayPoints wayWithWayPoints) {
+    public void initWayStatus(WayWithWayPoints wayWithWayPoints) {
         way = wayWithWayPoints.getWay();
         List<WayPoint> wp = wayWithWayPoints.getWayPoints();
         if (wp != null && wp.size() > 0) {
@@ -38,49 +35,55 @@ public class WayStatus {
         }
     }
 
+    public void clear() {
+        lastLocation = null;
+        lastRecordedTime = -1;
+        way = null;
+        wayPoints.clear();
+    }
+
     public void setEndTime() {
-        if (lastStartTime != -1) {
-            long t = SystemClock.elapsedRealtime() - lastStartTime;
+        if (lastRecordedTime != -1) {
+            long t = SystemClock.elapsedRealtime() - lastRecordedTime;
             way.setTotalTime(way.getTotalTime() + Math.max(0, t));
         }
         way.setEndTime(System.currentTimeMillis());
-        lastStartTime = -1;
+        lastRecordedTime = -1;
     }
 
-    public long calculateTotalTime() {
-        if (lastStartTime == -1) {
-            return way.getTotalTime();
+    public void calculateTotalTime(long currentTime) {
+        if (lastRecordedTime == -1) {
+            return;
         }
-        long t = SystemClock.elapsedRealtime() - lastStartTime;
-        return way.getTotalTime() + Math.max(0, t);
+        long t = currentTime - lastRecordedTime;
+        way.setTotalTime(way.getTotalTime() + Math.max(0, t));
+        lastRecordedTime = currentTime;
     }
 
     public void updateCurrentLocation(Location currentLocation) {
         //save the time passed since either start, or the last location
-        long currentTime = TimeUnit.NANOSECONDS.toMillis(currentLocation.getElapsedRealtimeNanos());
+        long currentTime = SystemClock.elapsedRealtime();
+        calculateTotalTime(currentTime);
+        lastRecordedTime = currentTime;
 
         if (lastLocation != null) {
             float totalDistance = way.getTotalDistance();
             long totalTime = way.getTotalTime();
-            long movingTime = way.getMovingTime();
             totalDistance += currentLocation.distanceTo(lastLocation);
-            long lastLocationTime = TimeUnit.NANOSECONDS.toMillis(lastLocation.getElapsedRealtimeNanos());
             way.setTotalDistance(totalDistance);
-            if (currentLocation.hasSpeed() || lastLocationTime != 0) {
-                long t = currentTime - lastLocationTime;
-                way.setMovingTime(movingTime + Math.max(0, t));
-            }
-            way.setAvgSpeed(totalDistance / totalTime);
-            way.setAvgMovingSpeed(totalDistance / movingTime);
+            way.setAvgSpeed(totalDistance / (totalTime / 1000));
         }
         checkMaxSpeed(currentLocation);
         checkAltitude(currentLocation);
-        this.lastLocation = currentLocation;
+        lastLocation = currentLocation;
         wayPoints.add(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
     }
 
     private void checkAltitude(Location location) {
-        if (location.hasAltitude()) {
+        if (lastLocation == null && location.hasAltitude()) {
+            way.setMaxAltitude(location.getAltitude());
+            way.setMinAltitude(location.getAltitude());
+        } else if (location.hasAltitude()) {
             double alt = location.getAltitude();
             if (alt > way.getMaxAltitude()) {
                 way.setMaxAltitude(alt);
@@ -92,32 +95,19 @@ public class WayStatus {
     }
 
     private void checkMaxSpeed(Location location) {
-        if (location.getSpeed() > way.getMaxSpeed()) {
+        if (lastLocation == null && location.hasSpeed()) {
+            way.setMaxSpeed(location.getSpeed());
+        } else if (location.hasSpeed() && location.getSpeed() > way.getMaxSpeed()) {
             way.setMaxSpeed(location.getSpeed());
         }
-    }
-
-    public void updateFirstLocation(Location location) {
-        lastLocation = location;
-        checkMaxSpeed(location);
-        checkAltitude(location);
-        wayPoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
     }
 
     public Location getLastLocation() {
         return lastLocation;
     }
 
-    public void setLastLocation(Location lastLocation) {
-        this.lastLocation = lastLocation;
-    }
-
-    public long getLastStartTime() {
-        return lastStartTime;
-    }
-
-    public void setLastStartTime(long lastStartTime) {
-        this.lastStartTime = lastStartTime;
+    public void setLastRecordedTime(long lastRecordedTime) {
+        this.lastRecordedTime = lastRecordedTime;
     }
 
     public Way getWay() {
@@ -130,16 +120,5 @@ public class WayStatus {
 
     public List<LatLng> getWayPoints() {
         return wayPoints;
-    }
-
-    public void setWayPoints(List<LatLng> wayPoints) {
-        this.wayPoints = wayPoints;
-    }
-
-    public float currentSpeed() {
-        if (lastLocation != null) {
-            return lastLocation.getSpeed();
-        }
-        return 0;
     }
 }

@@ -21,6 +21,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -31,21 +32,18 @@ import com.google.android.gms.location.LocationServices;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import hu.am2.myway.AppExecutors;
 import hu.am2.myway.Constants;
 import hu.am2.myway.R;
-import hu.am2.myway.location.model.WayUiModel;
 import hu.am2.myway.ui.permission.PermissionActivity;
 import timber.log.Timber;
 
 import static hu.am2.myway.location.WayRecorder.STATE_RECORDING;
-import static hu.am2.myway.location.WayRecorder.STATE_STOP;
 
 //based on: https://github.com/googlesamples/android-play-location/tree/master/LocationUpdatesForegroundService
 
 public class LocationService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private IBinder binder = new ServiceBinder();
+    private final IBinder binder = new ServiceBinder();
 
     private static final int UPDATE_INTERVAL_MILLISECONDS = 5000;
 
@@ -68,14 +66,11 @@ public class LocationService extends Service implements SharedPreferences.OnShar
 
     private SharedPreferences sharedPreferences;
 
-    private MutableLiveData<Location> lastLocation = new MutableLiveData<>();
+    private final MutableLiveData<Location> lastLocation = new MutableLiveData<>();
 
     private PowerManager.WakeLock wakeLock;
 
     private static final String WAKE_LOCK_TAG = "hum.am2.myway:locationservice";
-
-    @Inject
-    AppExecutors executors;
 
     @Override
     public void onCreate() {
@@ -84,13 +79,7 @@ public class LocationService extends Service implements SharedPreferences.OnShar
 
         Timber.d("onCreate: Service");
 
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        wayRecorder.setState(sharedPreferences.getInt(Constants.PREF_RECORDING_STATE, STATE_STOP));
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
 
@@ -115,13 +104,11 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         }
         HandlerThread handlerThread = new HandlerThread("locationService");
         handlerThread.start();
-        handler = new Handler(handlerThread.getLooper());
+        handler = new Handler();
 
         looper = handlerThread.getLooper();
 
         requestLocationUpdates(looper);
-
-        wayRecorder.loadWay();
     }
 
     private void handleLocationResult(LocationResult locationResult) {
@@ -190,25 +177,23 @@ public class LocationService extends Service implements SharedPreferences.OnShar
             startForeground(NOTIFICATION_ID, wayRecorder.getNotification(this));
             wayRecorder.startWayRecording();
             startUiTimer();
+            if (wakeLock == null) {
+                PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
+            }
             wakeLock.acquire();
 
         } else {
             Timber.d("Pausing recording from service");
+            handler.removeCallbacksAndMessages(null);
             wayRecorder.pauseWayRecording();
             stopForeground(true);
             stopSelf();
-            if (wakeLock.isHeld()) {
+            if (wakeLock != null && wakeLock.isHeld()) {
                 wakeLock.release();
+                wakeLock = null;
             }
         }
-    }
-
-    public LiveData<WayUiModel> getWayUiModelLiveData() {
-        return wayRecorder.getWayUiModelLiveData();
-    }
-
-    public LiveData<Long> getElapsedTimeLiveData() {
-        return wayRecorder.getElapsedTimeLiveData();
     }
 
     public LiveData<Integer> getStateLiveData() {
@@ -219,24 +204,31 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         return lastLocation;
     }
 
+    public LiveData<Long> getTotalTimeLiveData() {
+        return wayRecorder.getTotalTimeLiveData();
+    }
+
     @Override
     public void onDestroy() {
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         handler.removeCallbacksAndMessages(null);
         looper.quit();
-        if (wakeLock.isHeld()) {
+        if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
+            wakeLock = null;
         }
         Timber.d("<--DESTROY-->");
     }
 
     public void stopRecording() {
-        executors.getServiceExecutor().execute(() -> wayRecorder.stopWayRecording());
+        handler.removeCallbacksAndMessages(null);
+        wayRecorder.stopWayRecording();
         stopForeground(true);
         stopSelf();
-        if (wakeLock.isHeld()) {
+        if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
+            wakeLock = null;
         }
 
     }
@@ -260,8 +252,8 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     private final Runnable timeUpdater = new Runnable() {
         @Override
         public void run() {
-            wayRecorder.updateTime();
-            wayRecorder.updateWidget();
+            Log.d(TAG, "Time update");
+            wayRecorder.timedUpdate();
             if (wayRecorder.getState() == STATE_RECORDING) {
                 handler.postDelayed(this, 1000);
             }
@@ -271,4 +263,6 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     private void startUiTimer() {
         handler.postDelayed(timeUpdater, 1000);
     }
+
+    private static final String TAG = LocationService.class.getSimpleName();
 }

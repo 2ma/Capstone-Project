@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/my_way_background_landscape"
-    tools:context=".ui.main.MainBaseActivity"
+    tools:context=".ui.main.MainActivity"
     >
 
     <Button

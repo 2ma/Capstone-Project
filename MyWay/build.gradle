@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-alpha18'
+        classpath 'com.android.tools.build:gradle:3.2.0-beta01'
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -22,7 +22,7 @@ ext {
     buildTools = '27.0.3'
     supportLib = '27.1.1'
     archLifecycle = '1.1.1'
-    room = '1.1.0'
+    room = '1.1.1'
     playServices = '15.0.1'
     butterKnife = '8.8.1'
     timber = '4.7.0'

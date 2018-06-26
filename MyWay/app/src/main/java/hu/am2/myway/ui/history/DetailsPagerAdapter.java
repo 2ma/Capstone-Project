@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DetailsPagerAdapter extends PagerAdapter {
 
-    private List<View> layouts = new ArrayList<>();
+    private final List<View> layouts = new ArrayList<>();
 
     public void addLayout(View view) {
         layouts.add(view);

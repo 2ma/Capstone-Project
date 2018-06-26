@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;
 import hu.am2.myway.Constants;
 import hu.am2.myway.R;
+import hu.am2.myway.Utils;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayPoint;
 import hu.am2.myway.location.model.WayWithWayPoints;
@@ -44,16 +45,14 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private Marker startPoint;
     private Marker endPoint;
 
-    //details pager layout 1
-    TextView speedText;
-    TextView timeText;
-    TextView distanceText;
+    private TextView timeText;
+    private TextView distanceText;
 
     //details pager layout 2
-    TextView avgSpeed;
-    TextView avgMovingSpeed;
-    TextView maxAltitude;
-    TextView minAltitude;
+    private TextView avgSpeed;
+    private TextView maxSpeed;
+    private TextView maxAltitude;
+    private TextView minAltitude;
 
     @BindView(R.id.tabDots)
     TabLayout tabLayout;
@@ -94,13 +93,14 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private void setupDetailsPager() {
         View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
-        speedText = layoutOne.findViewById(R.id.speed);
+        //details pager layout 1
+        layoutOne.findViewById(R.id.speed).setVisibility(View.GONE);
         timeText = layoutOne.findViewById(R.id.time);
         distanceText = layoutOne.findViewById(R.id.distance);
 
         View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
         avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
-        avgMovingSpeed = layoutTwo.findViewById(R.id.avgMovingSpeed);
+        maxSpeed = layoutTwo.findViewById(R.id.maxSpeed);
         maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
         minAltitude = layoutTwo.findViewById(R.id.minAltitude);
 
@@ -158,8 +158,9 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
         }
         distanceText.setText(getString(R.string.distance_unit, way.getTotalDistance()));
         avgSpeed.setText(getString(R.string.speed_unit, way.getAvgSpeed()));
-        avgMovingSpeed.setText(getString(R.string.speed_unit, way.getAvgMovingSpeed()));
+        maxSpeed.setText(getString(R.string.speed_unit, way.getMaxSpeed()));
         maxAltitude.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
         minAltitude.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
+        timeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
     }
 }

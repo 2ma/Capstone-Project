@@ -17,8 +17,8 @@ import hu.am2.myway.location.model.WayWithWayPoints;
 @Singleton
 public class Repository {
 
-    private WayDao wayDao;
-    private AppExecutors executors;
+    private final WayDao wayDao;
+    private final AppExecutors executors;
 
     @Inject
     public Repository(WayDao wayDao, AppExecutors executors) {
@@ -68,5 +68,9 @@ public class Repository {
 
     public LiveData<List<Way>> getWaysForQuery(String query) {
         return wayDao.getAllWaysForQuery(query);
+    }
+
+    public WayPoint getWayWithLastLocationForWayId(long wayId) {
+        return wayDao.getLastWayPointForWayId(wayId);
     }
 }

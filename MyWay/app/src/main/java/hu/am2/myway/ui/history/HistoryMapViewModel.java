@@ -12,14 +12,11 @@ import hu.am2.myway.location.model.WayWithWayPoints;
 
 public class HistoryMapViewModel extends ViewModel {
 
-    private Repository repository;
-
-    private MutableLiveData<Long> wayId = new MutableLiveData<>();
-    private LiveData<WayWithWayPoints> wayWitWayPoints;
+    private final MutableLiveData<Long> wayId = new MutableLiveData<>();
+    private final LiveData<WayWithWayPoints> wayWitWayPoints;
 
     @Inject
     public HistoryMapViewModel(Repository repository) {
-        this.repository = repository;
         wayWitWayPoints = Transformations.switchMap(wayId, repository::getWayWithWayPointsLiveDataForId);
     }
 
@@ -29,7 +26,7 @@ public class HistoryMapViewModel extends ViewModel {
         }
     }
 
-    public LiveData<WayWithWayPoints> getWayWitWayPoints() {
+    LiveData<WayWithWayPoints> getWayWitWayPoints() {
         return wayWitWayPoints;
     }
 }

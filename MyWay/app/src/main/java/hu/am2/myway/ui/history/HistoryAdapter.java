@@ -21,17 +21,17 @@ import hu.am2.myway.location.model.Way;
 class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
     private List<Way> ways = Collections.emptyList();
-    private Resources resources;
+    private final Resources resources;
     private final SimpleDateFormat dateFormat;
     private final SimpleDateFormat timeFormat;
-    private RecyclerView historyList;
-    private TextView emptyView;
+    private final RecyclerView historyList;
+    private final TextView emptyView;
 
     public interface HistoryClickListener {
         void onItemClicked(long id);
     }
 
-    private HistoryClickListener listener;
+    private final HistoryClickListener listener;
 
     public HistoryAdapter(Resources resources, RecyclerView historyList, TextView emptyView, HistoryClickListener listener) {
         this.resources = resources;
@@ -77,15 +77,19 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
             emptyView.setVisibility(View.GONE);
         } else {
             historyList.setVisibility(View.GONE);
-            historyList.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.VISIBLE);
         }
     }
 
     class HistoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView wayNameText, distanceText, totalTimeText, dateText, timeText;
+        private final TextView wayNameText;
+        private final TextView distanceText;
+        private final TextView totalTimeText;
+        private final TextView dateText;
+        private final TextView timeText;
 
-        public HistoryViewHolder(View itemView) {
+        HistoryViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             wayNameText = itemView.findViewById(R.id.wayName);
@@ -95,7 +99,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
             timeText = itemView.findViewById(R.id.time);
         }
 
-        public void bindView(Way way) {
+        void bindView(Way way) {
             wayNameText.setText(way.getWayName());
             distanceText.setText(resources.getString(R.string.distance_unit, way.getTotalDistance()));
             totalTimeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
