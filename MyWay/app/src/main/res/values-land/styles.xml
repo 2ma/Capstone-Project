@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainBackground" parent="AppTheme">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/my_way_background_landscape</item>
+    </style>
+</resources>

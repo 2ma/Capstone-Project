@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainBackground" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/my_way_background_landscape</item>
+        <item name="android:windowEnterTransition">@transition/trans_slide_end</item>
+        <item name="android:windowExitTransition">@transition/trans_slide_start</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+</resources>

@@ -237,7 +237,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case android.R.id.home: {
                 if (stopRecordingDialog()) {
                     return true;
-                } else return super.onOptionsItemSelected(item);
+                } else {
+                    onBackPressed();
+                    return true;
+                }
             }
             case R.id.menu_map_normal: {
                 mapType = GoogleMap.MAP_TYPE_NORMAL;

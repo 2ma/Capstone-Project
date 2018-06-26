@@ -1,5 +1,6 @@
 package hu.am2.myway.ui.history;
 
+import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.util.List;
@@ -100,6 +102,15 @@ public class HistoryListActivity extends AppCompatActivity implements HistoryAda
         viewModel.getAllWays().observe(this, this::displayWayList);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void displayWayList(List<Way> ways) {
         adapter.setWays(ways);
     }
@@ -108,6 +119,11 @@ public class HistoryListActivity extends AppCompatActivity implements HistoryAda
     public void onItemClicked(long id) {
         Intent intent = new Intent(this, HistoryMapActivity.class);
         intent.putExtra(Constants.EXTRA_WAY_ID, id);
-        startActivity(intent);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Bundle activityOptions = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, activityOptions);
+        } else {
+            startActivity(intent);
+        }
     }
 }

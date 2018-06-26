@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/my_way_background_landscape"
     tools:context=".ui.main.MainActivity"
     >
 
@@ -60,6 +59,7 @@
         android:layout_width="0dp"
         android:layout_height="72dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/button_background_round"
         android:elevation="8dp"
         android:shadowColor="@android:color/black"

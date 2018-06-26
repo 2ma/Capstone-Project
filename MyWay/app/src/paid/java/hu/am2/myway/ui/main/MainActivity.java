@@ -1,14 +1,17 @@
 package hu.am2.myway.ui.main;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -94,17 +97,35 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.newWayBtn)
     public void onNewWayClick() {
-        startActivity(new Intent(MainActivity.this, MapActivity.class));
+        Intent intent = new Intent(MainActivity.this, MapActivity.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Bundle activityOptions = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, activityOptions);
+        } else {
+            startActivity(intent);
+        }
     }
 
     @OnClick(R.id.historyBtn)
     public void onHistoryClick() {
-        startActivity(new Intent(this, HistoryListActivity.class));
+        Intent intent = new Intent(MainActivity.this, HistoryListActivity.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Bundle activityOptions = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, activityOptions);
+        } else {
+            startActivity(intent);
+        }
     }
 
     @OnClick(R.id.settingsBtn)
     public void onSettingsClick() {
-        startActivity(new Intent(this, SettingsActivity.class));
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Bundle activityOptions = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, activityOptions);
+        } else {
+            startActivity(intent);
+        }
     }
 
 

@@ -8,9 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="NoBackground" parent="AppTheme">
+    <style name="MainBackground" parent="AppTheme">
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@null</item>
+        <item name="android:windowBackground">@drawable/my_way_background</item>
     </style>
 
     <style name="SettingsTheme" parent="Theme.AppCompat.Light">

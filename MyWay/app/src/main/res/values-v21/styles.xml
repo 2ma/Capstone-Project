@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainBackground" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/my_way_background</item>
+        <item name="android:windowEnterTransition">@transition/trans_slide_end</item>
+        <item name="android:windowExitTransition">@transition/trans_slide_start</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">false</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowEnterTransition">@transition/trans_slide_end</item>
+        <item name="android:windowExitTransition">@transition/trans_slide_start</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">false</item>
+    </style>
+
+    <style name="SettingsTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="android:windowEnterTransition">@transition/trans_slide_end</item>
+        <item name="android:windowExitTransition">@transition/trans_slide_start</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">false</item>
+    </style>
+</resources>
