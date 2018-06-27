@@ -14,7 +14,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class HistoryListActivity extends AppCompatActivity implements HistoryAda
     RecyclerView historyList;
 
     @BindView(R.id.emptyView)
-    TextView emptyView;
+    ImageView emptyView;
 
     private HistoryAdapter adapter;
 

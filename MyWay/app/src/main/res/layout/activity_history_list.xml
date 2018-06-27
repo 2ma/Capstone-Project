@@ -38,13 +38,16 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
-    <TextView
+    <ImageView
         android:id="@+id/emptyView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
-        android:text="@string/no_history"
+        android:adjustViewBounds="true"
+        android:src="@drawable/my_way_logo_green"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/no_history"
         />
 
 

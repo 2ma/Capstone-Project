@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -25,7 +26,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
     private final SimpleDateFormat dateFormat;
     private final SimpleDateFormat timeFormat;
     private final RecyclerView historyList;
-    private final TextView emptyView;
+    private final ImageView emptyView;
 
     public interface HistoryClickListener {
         void onItemClicked(long id);
@@ -33,7 +34,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
 
     private final HistoryClickListener listener;
 
-    public HistoryAdapter(Resources resources, RecyclerView historyList, TextView emptyView, HistoryClickListener listener) {
+    public HistoryAdapter(Resources resources, RecyclerView historyList, ImageView emptyView, HistoryClickListener listener) {
         this.resources = resources;
         this.historyList = historyList;
         this.emptyView = emptyView;

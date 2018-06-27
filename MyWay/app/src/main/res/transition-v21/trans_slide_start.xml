@@ -2,5 +2,10 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
     <slide
         android:duration="500"
-        android:slideEdge="start"/>
+        android:slideEdge="top">
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground"/>
+            <target android:excludeId="@android:id/navigationBarBackground"/>
+        </targets>
+    </slide>
 </transitionSet>

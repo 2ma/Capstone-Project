@@ -7,6 +7,7 @@
         <item name="android:windowExitTransition">@transition/trans_slide_start</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">false</item>
+        <item name="android:windowAllowEnterTransitionOverlap">false</item>
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -18,6 +19,7 @@
         <item name="android:windowExitTransition">@transition/trans_slide_start</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">false</item>
+        <item name="android:windowAllowEnterTransitionOverlap">false</item>
     </style>
 
     <style name="SettingsTheme" parent="Theme.AppCompat.Light">
@@ -30,5 +32,6 @@
         <item name="android:windowExitTransition">@transition/trans_slide_start</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">false</item>
+        <item name="android:windowAllowEnterTransitionOverlap">false</item>
     </style>
 </resources>

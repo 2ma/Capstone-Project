@@ -11,14 +11,15 @@
         android:id="@+id/wayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/distance"
         app:layout_constraintEnd_toStartOf="@+id/date"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="MyWay-2018.06.05 13:30"
-        android:layout_marginStart="8dp"
-        />
+        tools:text="MyWay-2018.06.05 13:30"/>
 
     <TextView
         android:id="@+id/distance"
