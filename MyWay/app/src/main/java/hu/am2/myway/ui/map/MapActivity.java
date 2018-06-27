@@ -15,6 +15,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -410,7 +411,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 13);
             return;
         }
+        try {
+            int gps = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+            if (gps == Settings.Secure.LOCATION_MODE_OFF) {
+                showLocationDialog();
+                return;
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
         bindService(new Intent(this, LocationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void showLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.gps_disabled);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            Intent gpsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(gpsIntent);
+        });
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+
+        });
+        builder.create().show();
     }
 
     @Override

@@ -7,11 +7,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -63,29 +61,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 14);
             return;
         }
-        try {
-            int gps = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
-            if (gps == Settings.Secure.LOCATION_MODE_OFF) {
-                showLocationDialog();
-                return;
-            }
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
         resumeActiveRecording();
-    }
-
-    private void showLocationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.gps_disabled);
-        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-            Intent gpsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(gpsIntent);
-        });
-        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
-
-        });
-        builder.create().show();
     }
 
     @Override
