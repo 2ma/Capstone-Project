@@ -43,14 +43,22 @@ public class MapViewModel extends ViewModel implements SharedPreferences.OnShare
                 temp = repository.getWayWithWayPointsLiveDataForId(id);
                 wayWithWayPointsLiveData.addSource(repository.getWayWithWayPointsLiveDataForId(id), wayWithWayPoints -> {
                     if (wayWithWayPoints != null && wayWithWayPoints.getWayPoints() != null) {
-                        List<LatLng> locations = new ArrayList<>();
+                        List<List<LatLng>> segments = new ArrayList<>();
                         List<WayPoint> wayPoints = wayWithWayPoints.getWayPoints();
                         int size = wayPoints.size();
-                        for (int i = 0; i < size; i++) {
-                            WayPoint w = wayPoints.get(i);
-                            locations.add(new LatLng(w.getLatitude(), w.getLongitude()));
+                        if (wayPoints.size() > 0) {
+                            List<LatLng> waySegment = new ArrayList<>();
+                            for (int i = 0; i < size; i++) {
+                                WayPoint w = wayPoints.get(i);
+                                if (w.getLatitude() == Constants.WAY_END_COORDINATE) {
+                                    segments.add(waySegment);
+                                    waySegment = new ArrayList<>();
+                                } else {
+                                    waySegment.add(new LatLng(w.getLatitude(), w.getLongitude()));
+                                }
+                            }
                         }
-                        wayWithWayPointsLiveData.postValue(new WayUiModel(wayWithWayPoints.getWay(), locations));
+                        wayWithWayPointsLiveData.postValue(new WayUiModel(wayWithWayPoints.getWay(), segments));
                     }
                 });
             }

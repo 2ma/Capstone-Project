@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -67,7 +68,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private LocationService locationService;
 
-    private Polyline path;
+    private List<Polyline> paths = new ArrayList<>();
     private Marker currentMarker;
     private Circle circle;
 
@@ -91,6 +92,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private TextView maxSpeedText;
     private TextView maxAltitudeText;
     private TextView minAltitudeText;
+
+    private int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
 
     @BindView(R.id.detailViewPager)
     InterceptViewPager detailViewPager;
@@ -209,13 +212,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
         String dist = getString(R.string.distance_unit, wayModel.getTotalDistance());
         distanceText.setText(Utils.getSmallSpannable(dist, dist.length() - 3));
-        showWayPath(wayModel.getWayPoints());
-        if (wayModel.getWayPoints().size() > 0) {
-            showWayPath(wayModel.getWayPoints());
-        } else if (path != null) {
-            path.remove();
-            path = null;
-        }
+        showWayPath(wayModel.getWaySegments());
         if (wayModel.getMaxAltitude() == 9999) {
             maxAltitudeText.setText(R.string.empty_altitude);
         } else {
@@ -234,7 +231,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         /*case WayStatus.STATE_RECORDING: {
                 Timber.d("startPauseRecording");
                 playPauseButtonState(true);
-                List<LatLng> wayPoints = wayModel.getWayPoints();
+                List<LatLng> wayPoints = wayModel.getWaySegments();
                 if (wayPoints.size() > 0) {
                     LatLng lastPos = wayPoints.get(wayPoints.size() - 1);
                     showWayPath(wayPoints);
@@ -260,6 +257,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 break;
             }*/
 
+    }
+
+    private void clearPaths() {
+        for (int i = 0; i < paths.size(); i++) {
+            paths.get(i).remove();
+        }
+        paths.clear();
     }
 
     private void updateElapsedTime(Long time) {
@@ -376,9 +380,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         maxAltitudeText.setText(R.string.altitude_default);
         minAltitudeText.setText(R.string.altitude_default);
 
-        if (path != null) {
-            path.remove();
-            path = null;
+        if (paths.size() > 0) {
+            clearPaths();
         }
         if (circle != null) {
             circle.remove();
@@ -415,19 +418,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void showWayPath(List<LatLng> wayPoints) {
-        if (wayPoints.size() > 0) {
-            if (path != null) {
-                path.remove();
-                path = null;
+    private void showWayPath(List<List<LatLng>> waySegments) {
+        int size = waySegments.size();
+        if (size > 0) {
+            if (paths.size() > 0) {
+                clearPaths();
             }
-            path = map.addPolyline(new PolylineOptions()
-                .color(Color.GREEN)
-                .width(6)
-                .addAll(wayPoints));
-        } else if (path != null) {
-            path.remove();
-            path = null;
+            //add all segments with different colors
+            for (int i = 0; i < size; i++) {
+                paths.add(map.addPolyline(new PolylineOptions()
+                    .color(pathColors[i % pathColors.length])
+                    .width(6)
+                    .addAll(waySegments.get(0))));
+            }
+        } else if (paths.size() > 0) {
+            clearPaths();
         }
     }
 

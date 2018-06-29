@@ -17,17 +17,16 @@ public class WayUiModel {
     private final double maxAltitude;
     //in meter
     private final double minAltitude;
+    //list of way sections
+    private final List<List<LatLng>> waySegments;
 
-
-    private final List<LatLng> wayPoints;
-
-    public WayUiModel(Way way, List<LatLng> wayPoints) {
+    public WayUiModel(Way way, List<List<LatLng>> waySegments) {
         this.totalTime = way.getTotalTime();
         this.totalDistance = way.getTotalDistance() / 1000;
         this.avgSpeed = way.getAvgSpeed() * 3.6f;
         this.maxAltitude = way.getMaxAltitude();
         this.minAltitude = way.getMinAltitude();
-        this.wayPoints = wayPoints;
+        this.waySegments = waySegments;
         this.maxSpeed = way.getMaxSpeed();
     }
 
@@ -55,7 +54,7 @@ public class WayUiModel {
         return minAltitude;
     }
 
-    public List<LatLng> getWayPoints() {
-        return wayPoints;
+    public List<List<LatLng>> getWaySegments() {
+        return waySegments;
     }
 }

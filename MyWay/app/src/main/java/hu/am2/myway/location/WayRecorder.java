@@ -114,7 +114,7 @@ public class WayRecorder {
                 totalTimeLiveData.postValue(totalTime.get());
                 WayPoint wayPoint = repository.getWayWithLastLocationForWayId(wayId);
                 if (wayPoint != null) {
-                    lastLocation = new Location("way");
+                    lastLocation = new Location("gps");
                     lastLocation.setSpeed(wayPoint.getSpeed());
                     lastLocation.setAccuracy(wayPoint.getAccuracy());
                     lastLocation.setLongitude(wayPoint.getLongitude());
@@ -162,7 +162,7 @@ public class WayRecorder {
                 synchronized (lock) {
                     WayWithWayPoints wayWithWayPoints = repository.getWayWithWayPointsForId(id);
                     wayStatus.initWayStatus(wayWithWayPoints);
-                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWayPoints()));
+                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
                     elapsedTime.postValue(wayStatus.getWay().getTotalTime());
                 }
                 Timber.d("Way loaded");
@@ -194,6 +194,33 @@ public class WayRecorder {
                     way.setMinAltitude(-9999);
                 }
                 way.setMaxSpeed(location.getSpeed());
+            }
+            lastLocation = location;
+            executors.getDiskIO().execute(() -> {
+                Way w;
+                synchronized (lock) {
+                    w = way.getWayCopy();
+                }
+                repository.updateWay(w);
+                repository.insertWayPoint(new WayPoint(location, wayId));
+            });
+        } else if (lastLocation.getLatitude() == Constants.WAY_END_COORDINATE) {
+            //track was paused, is continuing in a different location
+            stateLiveData.postValue(STATE_RECORDING);
+            speedLiveData.postValue(location.getSpeed());
+            synchronized (lock) {
+                if (location.hasSpeed() && location.getSpeed() > way.getMaxSpeed()) {
+                    way.setMaxSpeed(location.getSpeed());
+                }
+                if (location.hasAltitude()) {
+                    double alt = location.getAltitude();
+                    if (alt > way.getMaxAltitude()) {
+                        way.setMaxAltitude(alt);
+                    }
+                    if (alt < way.getMinAltitude()) {
+                        way.setMinAltitude(alt);
+                    }
+                }
             }
             lastLocation = location;
             executors.getDiskIO().execute(() -> {
@@ -242,7 +269,7 @@ public class WayRecorder {
             Location previousLocation = wayStatus.getLastLocation();
             if (previousLocation == null) {
                 wayStatus.updateCurrentLocation(location);
-                wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWayPoints()));
+                wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
                 repository.updateWay(wayStatus.getWay());
                 repository.insertWayPoint(new WayPoint(location, wayStatus.getWay().getId()));
             } else {
@@ -250,7 +277,7 @@ public class WayRecorder {
                 long time = TimeUnit.NANOSECONDS.toMillis(location.getElapsedRealtimeNanos() - previousLocation.getElapsedRealtimeNanos());
                 if (dist >= distanceInterval && time >= timeInterval) {
                     wayStatus.updateCurrentLocation(location);
-                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWayPoints()));
+                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
                     repository.updateWay(wayStatus.getWay());
                     repository.insertWayPoint(new WayPoint(location, wayStatus.getWay().getId()));
                 }
@@ -308,6 +335,11 @@ public class WayRecorder {
                 updateWidget();
             }
             repository.updateWay(w);
+            Location pause = new Location("gps");
+            pause.setLongitude(0);
+            pause.setLatitude(Constants.WAY_END_COORDINATE);
+            pause.setTime(System.currentTimeMillis());
+            repository.insertWayPoint(new WayPoint(pause, wayId));
             lastRecordedTime = -1;
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(Constants.PREF_RECORDING_STATE, STATE_PAUSE).apply();
@@ -333,6 +365,10 @@ public class WayRecorder {
             }
             updateWidget();
             repository.updateWay(w);
+            Location end = new Location("gps");
+            end.setLongitude(0);
+            end.setLatitude(Constants.WAY_END_COORDINATE);
+            repository.insertWayPoint(new WayPoint(end, wayId));
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putLong(Constants.PREF_WAY_ID, -1);
             editor.putInt(Constants.PREF_RECORDING_STATE, STATE_STOP).apply();
