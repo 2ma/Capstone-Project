@@ -20,6 +20,7 @@ import hu.am2.myway.data.Repository;
 import hu.am2.myway.location.LocationService;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.ui.main.MainActivity;
+import hu.am2.myway.ui.map.MapActivity;
 
 import static hu.am2.myway.location.WayRecorder.STATE_RECORDING;
 import static hu.am2.myway.location.WayRecorder.STATE_STOP;
@@ -80,6 +81,10 @@ public class MyWayWidget extends AppWidgetProvider {
                     pendingStop = PendingIntent.getService(context, 0, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
                 }
                 views.setOnClickPendingIntent(R.id.widgetStopBtn, pendingStop);
+
+                Intent intentMap = new Intent(context, MapActivity.class);
+                PendingIntent pendingMap = PendingIntent.getActivity(context, 0, intentMap, PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.widget, pendingMap);
                 appWidgetManager.updateAppWidget(appWidgetId, views);
             }
         } else {
