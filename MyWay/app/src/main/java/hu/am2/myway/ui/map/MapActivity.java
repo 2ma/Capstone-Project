@@ -23,7 +23,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +75,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
-    @BindView(R.id.startPauseBtn)
+    @BindView(R.id.startPauseFab)
     ImageButton startPauseBtn;
 
     @BindView(R.id.tabDots)
@@ -265,7 +264,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void updateElapsedTime(Long time) {
         String t = Utils.getTimeFromMilliseconds(time);
-        Log.d(TAG, "Update time: " + t);
         timeText.setText(t);
     }
 
@@ -392,7 +390,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    @OnClick(R.id.startPauseBtn)
+    @OnClick(R.id.startPauseFab)
     public void recordPause(View view) {
         if (gpsStatus) {
             recording();
@@ -407,7 +405,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    @OnClick(R.id.stopBtn)
+    @OnClick(R.id.stopFab)
     public void onStopClicked() {
         if (gpsStatus) {
             int state = locationService.getRecordingState();

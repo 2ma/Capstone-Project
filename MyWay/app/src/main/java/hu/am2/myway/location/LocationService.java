@@ -21,7 +21,6 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -147,8 +146,10 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         Timber.d("onStartCommand");
         String action = intent.getAction();
         if (Constants.ACTION_START_PAUSE_RECORDING.equals(action)) {
+            startForeground(NOTIFICATION_ID, wayRecorder.getNotification(this));
             startPauseRecording();
         } else if (Constants.ACTION_STOP_RECORDING.equals(action)) {
+            startForeground(NOTIFICATION_ID, wayRecorder.getNotification(this));
             stopRecording();
         }
         return START_NOT_STICKY;
@@ -257,7 +258,6 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     private final Runnable timeUpdater = new Runnable() {
         @Override
         public void run() {
-            Log.d(TAG, "Time update");
             wayRecorder.timedUpdate();
             if (wayRecorder.getState() == STATE_RECORDING) {
                 handler.postDelayed(this, 1000);

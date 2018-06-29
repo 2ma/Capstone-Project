@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "159afb51e34d272817adf8a0f9c68697",
+    "identityHash": "6491287b6888982eee5db0fce9c9bda0",
     "entities": [
       {
         "tableName": "way",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wayName` TEXT, `totalTime` INTEGER NOT NULL, `movingTime` INTEGER NOT NULL, `startTime` INTEGER NOT NULL, `endTime` INTEGER NOT NULL, `totalDistance` REAL NOT NULL, `avgSpeed` REAL NOT NULL, `maxSpeed` REAL NOT NULL, `maxAltitude` REAL NOT NULL, `minAltitude` REAL NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wayName` TEXT, `totalTime` INTEGER NOT NULL, `startTime` INTEGER NOT NULL, `endTime` INTEGER NOT NULL, `totalDistance` REAL NOT NULL, `avgSpeed` REAL NOT NULL, `maxSpeed` REAL NOT NULL, `maxAltitude` REAL NOT NULL, `minAltitude` REAL NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "wayName",
@@ -17,12 +17,6 @@
           {
             "fieldPath": "totalTime",
             "columnName": "totalTime",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "movingTime",
-            "columnName": "movingTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -155,7 +149,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"159afb51e34d272817adf8a0f9c68697\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6491287b6888982eee5db0fce9c9bda0\")"
     ]
   }
 }

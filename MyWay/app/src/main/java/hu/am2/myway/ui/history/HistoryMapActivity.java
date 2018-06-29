@@ -5,10 +5,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -50,14 +51,15 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private Marker startPoint;
     private Marker endPoint;
 
+    //details pager layout 1
+    private TextView avgSpeedText;
     private TextView timeText;
     private TextView distanceText;
 
     //details pager layout 2
-    private TextView avgSpeed;
-    private TextView maxSpeed;
-    private TextView maxAltitude;
-    private TextView minAltitude;
+    private TextView maxSpeedText;
+    private TextView maxAltitudeText;
+    private TextView minAltitudeText;
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
@@ -65,7 +67,13 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     TabLayout tabLayout;
 
     @BindView(R.id.detailViewPager)
-    ViewPager detailViewPager;
+    InterceptViewPager detailViewPager;
+
+    @BindView(R.id.startPauseFab)
+    FloatingActionButton startPauseFab;
+
+    @BindView(R.id.stopFab)
+    FloatingActionButton stopFab;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -79,9 +87,12 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_map);
+        setContentView(R.layout.activity_map);
 
         ButterKnife.bind(this);
+
+        stopFab.setVisibility(View.GONE);
+        startPauseFab.setVisibility(View.GONE);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -109,6 +120,12 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(MAP_TYPE, mapType);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
     }
 
     @Override
@@ -150,14 +167,17 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
         View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
         //details pager layout 1
         layoutOne.findViewById(R.id.speed).setVisibility(View.GONE);
+
+        avgSpeedText = layoutOne.findViewById(R.id.speed);
+        avgSpeedText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.avg_speed_icon);
         timeText = layoutOne.findViewById(R.id.time);
         distanceText = layoutOne.findViewById(R.id.distance);
 
         View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
-        avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
-        maxSpeed = layoutTwo.findViewById(R.id.maxSpeed);
-        maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
-        minAltitude = layoutTwo.findViewById(R.id.minAltitude);
+        layoutTwo.findViewById(R.id.avgSpeed).setVisibility(View.GONE);
+        maxSpeedText = layoutTwo.findViewById(R.id.maxSpeed);
+        maxAltitudeText = layoutTwo.findViewById(R.id.maxAltitude);
+        minAltitudeText = layoutTwo.findViewById(R.id.minAltitude);
 
         DetailsPagerAdapter detailsPagerAdapter = new DetailsPagerAdapter();
         detailsPagerAdapter.addLayout(layoutOne);
@@ -165,6 +185,9 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
 
         detailViewPager.setAdapter(detailsPagerAdapter);
         tabLayout.setupWithViewPager(detailViewPager, true);
+        detailViewPager.setInterceptViews(new View[]{avgSpeedText, timeText, distanceText}, new View[]{maxSpeedText, maxAltitudeText,
+            minAltitudeText});
+
     }
 
     @Override
@@ -224,18 +247,18 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
         String dist = getString(R.string.distance_unit, way.getTotalDistance() / 1000);
         distanceText.setText(Utils.getSmallSpannable(dist, dist.length() - 3));
         String as = getString(R.string.speed_unit, way.getAvgSpeed() * 3.6f);
-        avgSpeed.setText(Utils.getSmallSpannable(as, as.length() - 5));
+        avgSpeedText.setText(Utils.getSmallSpannable(as, as.length() - 5));
         String ms = getString(R.string.speed_unit, way.getMaxSpeed() * 3.6f);
-        maxSpeed.setText(Utils.getSmallSpannable(ms, ms.length() - 5));
+        maxSpeedText.setText(Utils.getSmallSpannable(ms, ms.length() - 5));
         if (way.getMaxAltitude() == 9999) {
-            maxAltitude.setText(R.string.empty_altitude);
+            maxAltitudeText.setText(R.string.empty_altitude);
         } else {
-            maxAltitude.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
+            maxAltitudeText.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
         }
         if (way.getMinAltitude() == -9999) {
-            minAltitude.setText(R.string.empty_altitude);
+            minAltitudeText.setText(R.string.empty_altitude);
         } else {
-            minAltitude.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
+            minAltitudeText.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
         }
         timeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
     }

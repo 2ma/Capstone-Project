@@ -371,7 +371,7 @@ public class WayRecorder {
             .setContentTitle(context.getString(R.string.app_name))
             .setOngoing(true)
             .setPriority(Notification.PRIORITY_HIGH)
-            .setSmallIcon(R.drawable.ic_place_black_24dp)
+            .setSmallIcon(R.drawable.my_way_logo_notification)
             .setTicker("Foreground")
             .addAction(R.drawable.ic_pause_png, context.getString(R.string.pause_notification), pausePending)
             .addAction(R.drawable.ic_stop_png, context.getString(R.string.stop_notification), stopPending)

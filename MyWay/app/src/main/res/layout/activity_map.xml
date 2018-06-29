@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/startPauseBtn"
+        android:id="@+id/startPauseFab"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="70dp"
         android:layout_height="70dp"
@@ -74,18 +74,18 @@
         app:backgroundTint="@color/delete_red"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/stopBtn"
+        app:layout_constraintEnd_toStartOf="@+id/stopFab"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_record_24dp"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/stopBtn"
+        android:id="@+id/stopFab"
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/startPauseBtn"
+        app:layout_constraintStart_toEndOf="@id/startPauseFab"
         app:fabSize="normal"
         app:backgroundTint="@color/colorPrimary"
         android:layout_marginStart="32dp"
