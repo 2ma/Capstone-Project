@@ -9,4 +9,7 @@
     <color name="white">#ffffff</color>
     <color name="delete_red">#f44336</color>
     <color name="signal_background">#FFD933</color>
+    <color name="blue_circle">#ade8dc</color>
+    <color name="yellow_circle">#faeba6</color>
+    <color name="pink_circle">#f8c1ba</color>
 </resources>

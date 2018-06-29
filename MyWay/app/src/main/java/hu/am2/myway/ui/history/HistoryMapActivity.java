@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,8 @@ import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayPoint;
 import hu.am2.myway.location.model.WayWithWayPoints;
 
+import static hu.am2.myway.ui.map.MapActivity.MAP_TYPE;
+
 public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
@@ -54,6 +57,8 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private TextView maxSpeed;
     private TextView maxAltitude;
     private TextView minAltitude;
+
+    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
     @BindView(R.id.tabDots)
     TabLayout tabLayout;
@@ -86,6 +91,13 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
 
         setupDetailsPager();
 
+        if (savedInstanceState != null) {
+            mapType = savedInstanceState.getInt(MAP_TYPE);
+        } else {
+            String m = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.map_type_key), "");
+            mapType = m.length() > 0 ? Integer.valueOf(m) : GoogleMap.MAP_TYPE_NORMAL;
+        }
+
         viewModel = ViewModelProviders.of(this, factory).get(HistoryMapViewModel.class);
 
         long id = getIntent().getLongExtra(Constants.EXTRA_WAY_ID, -1);
@@ -93,13 +105,44 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(MAP_TYPE, mapType);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                onBackPressed();
+                return true;
+            }
+            case R.id.menu_map_normal: {
+                mapType = GoogleMap.MAP_TYPE_NORMAL;
+                break;
+            }
+            case R.id.menu_map_hybrid: {
+                mapType = GoogleMap.MAP_TYPE_HYBRID;
+                break;
+            }
+            case R.id.menu_map_satellite: {
+                mapType = GoogleMap.MAP_TYPE_SATELLITE;
+                break;
+            }
+            case R.id.menu_map_terrain: {
+                mapType = GoogleMap.MAP_TYPE_TERRAIN;
+                break;
+            }
+            default:
+                super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
+        if (map != null) {
+            map.setMapType(mapType);
+        }
+
+        return true;
     }
 
     private void setupDetailsPager() {
@@ -126,6 +169,7 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.setMapType(mapType);
         viewModel.getWayWitWayPoints().observe(this, this::displayMapHistory);
     }
 
@@ -167,11 +211,20 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
             }
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 100));
         }
+
         distanceText.setText(getString(R.string.distance_unit, way.getTotalDistance()));
         avgSpeed.setText(getString(R.string.speed_unit, way.getAvgSpeed()));
         maxSpeed.setText(getString(R.string.speed_unit, way.getMaxSpeed()));
-        maxAltitude.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
-        minAltitude.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
+        if (way.getMaxAltitude() == 9999) {
+            maxAltitude.setText(R.string.empty_altitude);
+        } else {
+            maxAltitude.setText(getString(R.string.altitude_unit, way.getMaxAltitude()));
+        }
+        if (way.getMinAltitude() == -9999) {
+            minAltitude.setText(R.string.empty_altitude);
+        } else {
+            minAltitude.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
+        }
         timeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
     }
 }

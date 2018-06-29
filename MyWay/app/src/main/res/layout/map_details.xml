@@ -3,86 +3,69 @@
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             android:background="@android:color/white"
+                                             android:layout_height="wrap_content"
     >
 
-    <TextView
-        android:id="@+id/speedTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="@string/speed"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="@+id/timeTitle"
-        app:layout_constraintEnd_toStartOf="@+id/speed"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
+    <com.tolstykh.textviewrichdrawable.TextViewRichDrawable
         android:id="@+id/speed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:text="@string/speed_default"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="@+id/time"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/speedTitle"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="37km/h"/>
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="150dp"
+        android:gravity="center"
+        android:background="@drawable/blue_round_back"
+        android:drawableBottom="@drawable/speed_icon"
+        app:compoundDrawableHeight="32dp"
+        app:compoundDrawableWidth="32dp"
+        android:drawablePadding="-25dp"
+        android:elevation="8dp"
+        />
 
-    <TextView
-        android:id="@+id/timeTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="@string/time"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="@+id/distanceTitle"
-        app:layout_constraintEnd_toStartOf="@+id/time"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/speedTitle"/>
-
-    <TextView
+    <com.tolstykh.textviewrichdrawable.TextViewRichDrawable
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:text="@string/time_default"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="@+id/distance"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/timeTitle"
-        app:layout_constraintTop_toBottomOf="@id/speedTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="68dp"
+        android:gravity="center"
+        android:background="@drawable/yellow_round_back"
+        android:drawableBottom="@drawable/time_icon"
+        app:compoundDrawableHeight="32dp"
+        app:compoundDrawableWidth="32dp"
+        android:drawablePadding="-20dp"
+        android:paddingBottom="4dp"
+        android:elevation="8dp"
         tools:text="1:30"/>
 
-    <TextView
-        android:id="@+id/distanceTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="@string/distance"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/distance"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/timeTitle"/>
 
-    <TextView
+    <com.tolstykh.textviewrichdrawable.TextViewRichDrawable
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:text="@string/distance_default"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/distanceTitle"
-        app:layout_constraintTop_toBottomOf="@id/time"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="4dp"
+        android:gravity="center"
+        android:background="@drawable/pink_round_back"
+        android:drawableBottom="@drawable/distance_icon"
+        app:compoundDrawableHeight="32dp"
+        app:compoundDrawableWidth="32dp"
+        android:drawablePadding="-20dp"
+        android:paddingBottom="4dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="8dp"
         tools:text="50m"/>
 
 </android.support.constraint.ConstraintLayout>

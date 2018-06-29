@@ -8,7 +8,6 @@ public class Way {
 
     private String wayName;
     private long totalTime;
-    private long movingTime;
     private long startTime;
     private long endTime;
     private float totalDistance;
@@ -26,7 +25,6 @@ public class Way {
         return new Way(
             wayName,
             totalTime,
-            movingTime,
             startTime,
             endTime,
             totalDistance,
@@ -37,11 +35,10 @@ public class Way {
             id);
     }
 
-    private Way(String wayName, long totalTime, long movingTime, long startTime, long endTime, float totalDistance, float avgSpeed, float maxSpeed,
+    private Way(String wayName, long totalTime, long startTime, long endTime, float totalDistance, float avgSpeed, float maxSpeed,
                 double maxAltitude, double minAltitude, long id) {
         this.wayName = wayName;
         this.totalTime = totalTime;
-        this.movingTime = movingTime;
         this.startTime = startTime;
         this.endTime = endTime;
         this.totalDistance = totalDistance;
@@ -75,14 +72,6 @@ public class Way {
 
     public void setTotalTime(long totalTime) {
         this.totalTime = totalTime;
-    }
-
-    public long getMovingTime() {
-        return movingTime;
-    }
-
-    public void setMovingTime(long movingTime) {
-        this.movingTime = movingTime;
     }
 
     public float getTotalDistance() {

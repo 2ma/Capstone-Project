@@ -66,7 +66,8 @@ public class LocationService extends Service implements SharedPreferences.OnShar
 
     private SharedPreferences sharedPreferences;
 
-    private final MutableLiveData<Location> lastLocation = new MutableLiveData<>();
+    private final MutableLiveData<Location> lastLocationLiveData = new MutableLiveData<>();
+
 
     private PowerManager.WakeLock wakeLock;
 
@@ -114,7 +115,7 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     private void handleLocationResult(LocationResult locationResult) {
         if (locationResult != null && locationResult.getLastLocation() != null) {
             Location location = locationResult.getLastLocation();
-            lastLocation.postValue(location);
+            lastLocationLiveData.postValue(location);
             if (wayRecorder.getState() == WayRecorder.STATE_RECORDING) {
                 wayRecorder.handleLastLocation(location);
             }
@@ -201,11 +202,15 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     }
 
     public LiveData<Location> getLocationLiveData() {
-        return lastLocation;
+        return lastLocationLiveData;
     }
 
     public LiveData<Long> getTotalTimeLiveData() {
         return wayRecorder.getTotalTimeLiveData();
+    }
+
+    public LiveData<Float> getSpeedLiveData() {
+        return wayRecorder.getSpeedLiveData();
     }
 
     @Override

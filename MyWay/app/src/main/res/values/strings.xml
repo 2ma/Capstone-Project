@@ -56,5 +56,6 @@
     <string name="menu_map_terrain">Map terrain</string>
     <string name="menu_map_normal">Map normal</string>
     <string name="menu_map_hybrid">Map hybrid</string>
+    <string name="empty_altitude">- m</string>
 
 </resources>

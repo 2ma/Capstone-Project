@@ -9,10 +9,10 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <fragment android:id="@+id/map"
@@ -21,69 +21,78 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="0dp"
               android:layout_height="0dp"
-              app:layout_constraintTop_toBottomOf="@id/toolbar"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintEnd_toStartOf="@+id/detailViewPager"
-              app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
+              app:layout_constraintTop_toBottomOf="@id/toolbar"
               tools:context=".ui.map.MapActivity"/>
 
     <TextView
         android:id="@+id/waitingForSignal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="4dp"
         android:background="@color/signal_background"
+        android:padding="4dp"
         android:text="@string/waiting_for_signal"
         android:textColor="@color/lightBlack"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/map"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        android:visibility="gone"
         />
 
-    <android.support.v4.view.ViewPager
+    <hu.am2.myway.ui.history.InterceptViewPager
         android:id="@+id/detailViewPager"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toEndOf="@id/map"
+        android:layout_height="190dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/startPauseBtn"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         />
     <!--based on: https://stackoverflow.com/questions/20586619/android-viewpager-with-bottom-dots-->
     <android.support.design.widget.TabLayout
         android:id="@+id/tabDots"
-        app:layout_constraintBottom_toBottomOf="@id/detailViewPager"
-        app:layout_constraintStart_toStartOf="@id/detailViewPager"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/detailViewPager"
         app:layout_constraintEnd_toEndOf="@id/detailViewPager"
+        app:layout_constraintStart_toStartOf="@id/detailViewPager"
         app:tabBackground="@drawable/tab_selector"
         app:tabGravity="center"
-        app:tabIndicatorHeight="0dp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
+        app:tabIndicatorHeight="0dp"/>
 
-    <ImageButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/startPauseBtn"
-        android:layout_width="0dp"
-        android:layout_height="54dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         app:srcCompat="@drawable/ic_record_24dp"
+        app:backgroundTint="@color/delete_red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/stopBtn"
-        android:background="@color/colorPrimary"
         style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_margin="16dp"
+        app:fabSize="normal"
         android:contentDescription="@string/record_pause_btn_content"/>
 
-    <ImageButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/stopBtn"
-        android:layout_width="0dp"
-        android:layout_height="54dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/startPauseBtn"
+        app:fabSize="normal"
+        app:backgroundTint="@color/colorPrimary"
+        android:layout_margin="16dp"
         app:srcCompat="@drawable/ic_stop_24dp"
-        android:background="@color/colorPrimary"
         style="@style/Widget.AppCompat.Button.Colored"
         android:contentDescription="@string/stop_btn_content"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.45"/>
 
 </android.support.constraint.ConstraintLayout>

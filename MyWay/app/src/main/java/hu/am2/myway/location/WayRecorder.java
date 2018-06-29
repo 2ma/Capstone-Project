@@ -15,7 +15,6 @@ import android.location.Location;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -49,6 +48,7 @@ public class WayRecorder {
 
     private final MutableLiveData<Integer> stateLiveData = new MutableLiveData<>();
     private final MutableLiveData<Long> totalTimeLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Float> speedLiveData = new MutableLiveData<>();
 
     private final SharedPreferences sharedPreferences;
 
@@ -179,9 +179,11 @@ public class WayRecorder {
 
         if (!location.hasAccuracy() || location.getAccuracy() > gpsAccuracy) {
             stateLiveData.postValue(STATE_WAITING_FOR_SIGNAL);
+            speedLiveData.postValue(0f);
             return;
         }
         stateLiveData.postValue(STATE_RECORDING);
+        speedLiveData.postValue(location.getSpeed());
         if (lastLocation == null) {
             synchronized (lock) {
                 if (location.hasAltitude()) {
@@ -295,12 +297,13 @@ public class WayRecorder {
     void pauseWayRecording() {
         state = STATE_PAUSE;
         stateLiveData.postValue(STATE_PAUSE);
+        speedLiveData.postValue(0f);
         executors.getServiceExecutor().execute(() -> {
             Way w;
             synchronized (lock) {
                 calculateTotalTime();
                 way.setTotalTime(totalTime.get());
-                way.setEndTime(lastRecordedTime);
+                way.setEndTime(System.currentTimeMillis());
                 w = way.getWayCopy();
                 updateWidget();
             }
@@ -316,12 +319,13 @@ public class WayRecorder {
     void stopWayRecording() {
         state = STATE_STOP;
         stateLiveData.postValue(STATE_STOP);
+        speedLiveData.postValue(0f);
         executors.getServiceExecutor().execute(() -> {
             Way w;
             synchronized (lock) {
                 calculateTotalTime();
                 way.setTotalTime(totalTime.get());
-                way.setEndTime(lastRecordedTime);
+                way.setEndTime(System.currentTimeMillis());
                 totalTime.set(0);
                 totalTimeLiveData.postValue(0L);
                 w = way.getWayCopy();
@@ -377,8 +381,12 @@ public class WayRecorder {
         return builder.build();
     }
 
-    public LiveData<Long> getTotalTimeLiveData() {
+    LiveData<Long> getTotalTimeLiveData() {
         return totalTimeLiveData;
+    }
+
+    public LiveData<Float> getSpeedLiveData() {
+        return speedLiveData;
     }
 
     void timedUpdate() {
@@ -399,7 +407,6 @@ public class WayRecorder {
 
     private void updateTime() {
         calculateTotalTime();
-        Log.d(TAG, "updateTime: " + totalTime.get());
         totalTimeLiveData.postValue(totalTime.get());
     }
 

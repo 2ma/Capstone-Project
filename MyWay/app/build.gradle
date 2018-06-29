@@ -95,6 +95,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:$playServices"
     implementation "com.google.android.gms:play-services-ads:$playServices"
 
+    implementation 'com.tolstykh.textviewrichdrawable:textview-rich-drawable:0.3.2'
+
     //test
     testImplementation "junit:junit:$junit"
 

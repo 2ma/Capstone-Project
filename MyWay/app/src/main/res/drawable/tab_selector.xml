@@ -4,15 +4,15 @@
     <item android:state_selected="true">
         <shape android:innerRadius="0dp"
                android:shape="ring"
-               android:thickness="4dp"
+               android:thickness="6dp"
                android:useLevel="false">
-            <solid android:color="@color/colorAccent"/>
+            <solid android:color="@color/colorPrimary"/>
         </shape>
     </item>
     <item>
         <shape android:innerRadius="0dp"
                android:shape="ring"
-               android:thickness="2dp"
+               android:thickness="4dp"
                android:useLevel="false">
             <solid android:color="@color/lightBlack"/>
         </shape>

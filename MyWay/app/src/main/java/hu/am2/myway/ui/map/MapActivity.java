@@ -20,10 +20,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,10 +60,11 @@ import hu.am2.myway.location.LocationService;
 import hu.am2.myway.location.WayRecorder;
 import hu.am2.myway.location.model.WayUiModel;
 import hu.am2.myway.ui.history.DetailsPagerAdapter;
+import hu.am2.myway.ui.history.InterceptViewPager;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final String MAP_TYPE = "MAP_TYPE";
+    public static final String MAP_TYPE = "MAP_TYPE";
     private static final String TAG = MapActivity.class.getSimpleName();
     private GoogleMap map;
 
@@ -88,13 +90,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private TextView distanceText;
 
     //details pager layout 2
-    private TextView avgSpeed;
-    private TextView maxSpeed;
-    private TextView maxAltitude;
-    private TextView minAltitude;
+    private TextView avgSpeedText;
+    private TextView maxSpeedText;
+    private TextView maxAltitudeText;
+    private TextView minAltitudeText;
 
     @BindView(R.id.detailViewPager)
-    ViewPager detailViewPager;
+    InterceptViewPager detailViewPager;
 
     @BindView(R.id.waitingForSignal)
     TextView waitingForSignal;
@@ -104,6 +106,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Inject
     ViewModelProvider.Factory factory;
+
+    private boolean gpsStatus = false;
 
     private MapViewModel viewModel;
 
@@ -119,9 +123,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });*/
             //locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
-            locationService.getTotalTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
-            locationService.getStateLiveData().observe(MapActivity.this, state -> handleState(state));
-            locationService.getLocationLiveData().observe(MapActivity.this, location -> handleLocation(location));
+            if (map != null && !locationService.getSpeedLiveData().hasObservers()) {
+                observeData();
+            }
             bound = true;
         }
 
@@ -131,40 +135,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             bound = false;
         }
     };
-
-    private void handleLocation(Location location) {
-        if (location != null) {
-            LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-            //location speed is in m/s
-            speedText.setText(getString(R.string.speed_unit, location.getSpeed() * 3.6f));
-            if (currentMarker == null) {
-                currentMarker = map.addMarker(new MarkerOptions().position(pos));
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
-            } else {
-                currentMarker.setPosition(pos);
-                map.animateCamera(CameraUpdateFactory.newLatLng(pos));
-            }
-            if (circle == null) {
-                circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
-                    .fillColor(R.color.circleBackground)
-                    .strokeColor(R.color.circleLine)
-                    .strokeWidth(1));
-            } else {
-                circle.setCenter(pos);
-            }
-        }
-    }
-
-    private void handleState(Integer state) {
-        playPauseButtonState(state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_WAITING_FOR_SIGNAL);
-        waitingForSignal.setVisibility(state == WayRecorder.STATE_WAITING_FOR_SIGNAL ? View.VISIBLE : View.GONE);
-    }
-
-    private void updateElapsedTime(Long time) {
-        String t = Utils.getTimeFromMilliseconds(time);
-        Log.d(TAG, "Update time: " + t);
-        timeText.setText(t);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +164,113 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         viewModel.getWayUiModelLiveData().observe(this, this::handleWayUiModel);
     }
 
+    private void observeData() {
+        locationService.getTotalTimeLiveData().observe(MapActivity.this, this::updateElapsedTime);
+        locationService.getStateLiveData().observe(MapActivity.this, this::handleState);
+        locationService.getLocationLiveData().observe(MapActivity.this, this::handleLocation);
+        locationService.getSpeedLiveData().observe(MapActivity.this, this::handleSpeed);
+    }
+
+    private void handleSpeed(Float speed) {
+        //location speed is in m/s
+        String s = getString(R.string.speed_unit, speed * 3.6f);
+        speedText.setText(getSmallSpannable(s, s.length() - 5));
+    }
+
+    private void handleLocation(Location location) {
+        if (location != null) {
+            LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+
+            if (currentMarker == null) {
+                currentMarker = map.addMarker(new MarkerOptions().position(pos));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
+            } else {
+                currentMarker.setPosition(pos);
+                map.animateCamera(CameraUpdateFactory.newLatLng(pos));
+            }
+            if (circle == null) {
+                circle = map.addCircle(new CircleOptions().center(pos).radius(location.getAccuracy())
+                    .fillColor(R.color.circleBackground)
+                    .strokeColor(R.color.circleLine)
+                    .strokeWidth(1));
+            } else {
+                circle.setCenter(pos);
+            }
+        }
+    }
+
+    private void handleState(Integer state) {
+        playPauseButtonState(state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_WAITING_FOR_SIGNAL);
+        waitingForSignal.setVisibility(state == WayRecorder.STATE_WAITING_FOR_SIGNAL ? View.VISIBLE : View.GONE);
+    }
+
+    private void handleWayUiModel(WayUiModel wayModel) {
+        if (wayModel == null) {
+            clearUi();
+            return;
+        }
+        //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
+        String dist = getString(R.string.distance_unit, wayModel.getTotalDistance());
+        distanceText.setText(getSmallSpannable(dist, dist.length() - 3));
+        showWayPath(wayModel.getWayPoints());
+        if (wayModel.getWayPoints().size() > 0) {
+            showWayPath(wayModel.getWayPoints());
+        } else if (path != null) {
+            path.remove();
+            path = null;
+        }
+        if (wayModel.getMaxAltitude() == 9999) {
+            maxAltitudeText.setText(R.string.empty_altitude);
+        } else {
+            maxAltitudeText.setText(getString(R.string.altitude_unit, wayModel.getMaxAltitude()));
+        }
+        if (wayModel.getMinAltitude() == -9999) {
+            minAltitudeText.setText(R.string.empty_altitude);
+        } else {
+            minAltitudeText.setText(getString(R.string.altitude_unit, wayModel.getMinAltitude()));
+        }
+        String avgSpeed = getString(R.string.speed_unit, wayModel.getAvgSpeed());
+        avgSpeedText.setText(getSmallSpannable(avgSpeed, avgSpeed.length() - 5));
+        String maxSpeed = getString(R.string.speed_unit, wayModel.getMaxSpeed());
+        maxSpeedText.setText(getSmallSpannable(maxSpeed, maxSpeed.length() - 5));
+
+        /*case WayStatus.STATE_RECORDING: {
+                Timber.d("startPauseRecording");
+                playPauseButtonState(true);
+                List<LatLng> wayPoints = wayModel.getWayPoints();
+                if (wayPoints.size() > 0) {
+                    LatLng lastPos = wayPoints.get(wayPoints.size() - 1);
+                    showWayPath(wayPoints);
+
+                    if (currentMarker == null) {
+                        currentMarker = map.addMarker(new MarkerOptions().position(lastPos));
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPos, 15f));
+                    } else {
+                        currentMarker.setPosition(lastPos);
+                        map.animateCamera(CameraUpdateFactory.newLatLng(lastPos));
+                    }
+                    if (circle == null) {
+                        circle = map.addCircle(new CircleOptions().center(lastPos).radius(location.getAccuracy())
+                            .fillColor(R.color.circleBackground)
+                            .strokeColor(R.color.circleLine)
+                            .strokeWidth(1));
+                    } else {
+                        circle.setCenter(pos);
+                    }
+                    speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
+                    distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
+                }
+                break;
+            }*/
+
+    }
+
+    private void updateElapsedTime(Long time) {
+        String t = Utils.getTimeFromMilliseconds(time);
+        Log.d(TAG, "Update time: " + t);
+        timeText.setText(t);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(MAP_TYPE, mapType);
@@ -207,10 +284,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         distanceText = layoutOne.findViewById(R.id.distance);
 
         View layoutTwo = getLayoutInflater().inflate(R.layout.map_details_more, null);
-        avgSpeed = layoutTwo.findViewById(R.id.avgSpeed);
-        maxSpeed = layoutTwo.findViewById(R.id.maxSpeed);
-        maxAltitude = layoutTwo.findViewById(R.id.maxAltitude);
-        minAltitude = layoutTwo.findViewById(R.id.minAltitude);
+        avgSpeedText = layoutTwo.findViewById(R.id.avgSpeed);
+        maxSpeedText = layoutTwo.findViewById(R.id.maxSpeed);
+        maxAltitudeText = layoutTwo.findViewById(R.id.maxAltitude);
+        minAltitudeText = layoutTwo.findViewById(R.id.minAltitude);
 
         DetailsPagerAdapter detailsPagerAdapter = new DetailsPagerAdapter();
         detailsPagerAdapter.addLayout(layoutOne);
@@ -218,6 +295,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         detailViewPager.setAdapter(detailsPagerAdapter);
         tabLayout.setupWithViewPager(detailViewPager, true);
+        detailViewPager.setInterceptViews(new View[]{speedText, timeText, distanceText}, new View[]{avgSpeedText, maxSpeedText, maxAltitudeText,
+            minAltitudeText});
     }
 
     @Override
@@ -271,6 +350,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private boolean stopRecordingDialog() {
+        if (!gpsStatus) {
+            return false;
+        }
         int state = locationService.getRecordingState();
         if (state == WayRecorder.STATE_RECORDING || state == WayRecorder.STATE_PAUSE) {
             AlertDialog.Builder aBuilder = new AlertDialog.Builder(this);
@@ -293,10 +375,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         timeText.setText(R.string.time_default);
         distanceText.setText(R.string.distance_default);
 
-        avgSpeed.setText(R.string.speed_default);
-        maxSpeed.setText(R.string.speed_default);
-        maxAltitude.setText(R.string.altitude_default);
-        minAltitude.setText(R.string.altitude_default);
+        avgSpeedText.setText(R.string.speed_default);
+        maxSpeedText.setText(R.string.speed_default);
+        maxAltitudeText.setText(R.string.altitude_default);
+        minAltitudeText.setText(R.string.altitude_default);
 
         if (path != null) {
             path.remove();
@@ -314,7 +396,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @OnClick(R.id.startPauseBtn)
     public void recordPause(View view) {
-        recording();
+        if (gpsStatus) {
+            recording();
+        }
     }
 
     private void playPauseButtonState(boolean state) {
@@ -327,61 +411,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @OnClick(R.id.stopBtn)
     public void onStopClicked() {
-        int state = locationService.getRecordingState();
-        if (state != WayRecorder.STATE_STOP) {
-            locationService.stopRecording();
+        if (gpsStatus) {
+            int state = locationService.getRecordingState();
+            if (state != WayRecorder.STATE_STOP) {
+                locationService.stopRecording();
+            }
         }
     }
 
-    private void handleWayUiModel(WayUiModel wayModel) {
-        if (wayModel == null) {
-            clearUi();
-            return;
-        }
-        //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
-        distanceText.setText(getString(R.string.distance_unit, wayModel.getTotalDistance()));
-        showWayPath(wayModel.getWayPoints());
-        if (wayModel.getWayPoints().size() > 0) {
-            showWayPath(wayModel.getWayPoints());
-        } else if (path != null) {
-            path.remove();
-            path = null;
-        }
-
-        avgSpeed.setText(getString(R.string.speed_unit, wayModel.getAvgSpeed()));
-        maxSpeed.setText(getString(R.string.speed_unit, wayModel.getMaxSpeed()));
-        maxAltitude.setText(getString(R.string.altitude_unit, wayModel.getMaxAltitude()));
-        minAltitude.setText(getString(R.string.altitude_unit, wayModel.getMinAltitude()));
-
-        /*case WayStatus.STATE_RECORDING: {
-                Timber.d("startPauseRecording");
-                playPauseButtonState(true);
-                List<LatLng> wayPoints = wayModel.getWayPoints();
-                if (wayPoints.size() > 0) {
-                    LatLng lastPos = wayPoints.get(wayPoints.size() - 1);
-                    showWayPath(wayPoints);
-
-                    if (currentMarker == null) {
-                        currentMarker = map.addMarker(new MarkerOptions().position(lastPos));
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPos, 15f));
-                    } else {
-                        currentMarker.setPosition(lastPos);
-                        map.animateCamera(CameraUpdateFactory.newLatLng(lastPos));
-                    }
-                    if (circle == null) {
-                        circle = map.addCircle(new CircleOptions().center(lastPos).radius(location.getAccuracy())
-                            .fillColor(R.color.circleBackground)
-                            .strokeColor(R.color.circleLine)
-                            .strokeWidth(1));
-                    } else {
-                        circle.setCenter(pos);
-                    }
-                    speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
-                    distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
-                }
-                break;
-            }*/
-
+    private SpannableString getSmallSpannable(String string, int start) {
+        SpannableString spannableString = new SpannableString(string);
+        spannableString.setSpan(new RelativeSizeSpan(0.5f), start, string.length(), 0);
+        return spannableString;
     }
 
     private void showWayPath(List<LatLng> wayPoints) {
@@ -392,7 +433,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             path = map.addPolyline(new PolylineOptions()
                 .color(Color.GREEN)
-                .width(3)
+                .width(6)
                 .addAll(wayPoints));
         } else if (path != null) {
             path.remove();
@@ -415,7 +456,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             int gps = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
             if (gps == Settings.Secure.LOCATION_MODE_OFF) {
                 showLocationDialog();
+                gpsStatus = false;
                 return;
+            } else {
+                gpsStatus = true;
             }
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
@@ -432,7 +476,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             startActivity(gpsIntent);
         });
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
-
         });
         builder.create().show();
     }
@@ -473,6 +516,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.setMapType(mapType);
+        if (bound && !locationService.getSpeedLiveData().hasObservers()) {
+            observeData();
+        }
         // Add a marker in Sydney and move the camera
         /*LatLng sydney = new LatLng(-34, 151);
         map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
