@@ -23,8 +23,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -174,7 +172,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void handleSpeed(Float speed) {
         //location speed is in m/s
         String s = getString(R.string.speed_unit, speed * 3.6f);
-        speedText.setText(getSmallSpannable(s, s.length() - 5));
+        speedText.setText(Utils.getSmallSpannable(s, s.length() - 5));
     }
 
     private void handleLocation(Location location) {
@@ -211,7 +209,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
         String dist = getString(R.string.distance_unit, wayModel.getTotalDistance());
-        distanceText.setText(getSmallSpannable(dist, dist.length() - 3));
+        distanceText.setText(Utils.getSmallSpannable(dist, dist.length() - 3));
         showWayPath(wayModel.getWayPoints());
         if (wayModel.getWayPoints().size() > 0) {
             showWayPath(wayModel.getWayPoints());
@@ -230,9 +228,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             minAltitudeText.setText(getString(R.string.altitude_unit, wayModel.getMinAltitude()));
         }
         String avgSpeed = getString(R.string.speed_unit, wayModel.getAvgSpeed());
-        avgSpeedText.setText(getSmallSpannable(avgSpeed, avgSpeed.length() - 5));
+        avgSpeedText.setText(Utils.getSmallSpannable(avgSpeed, avgSpeed.length() - 5));
         String maxSpeed = getString(R.string.speed_unit, wayModel.getMaxSpeed());
-        maxSpeedText.setText(getSmallSpannable(maxSpeed, maxSpeed.length() - 5));
+        maxSpeedText.setText(Utils.getSmallSpannable(maxSpeed, maxSpeed.length() - 5));
 
         /*case WayStatus.STATE_RECORDING: {
                 Timber.d("startPauseRecording");
@@ -417,12 +415,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 locationService.stopRecording();
             }
         }
-    }
-
-    private SpannableString getSmallSpannable(String string, int start) {
-        SpannableString spannableString = new SpannableString(string);
-        spannableString.setSpan(new RelativeSizeSpan(0.5f), start, string.length(), 0);
-        return spannableString;
     }
 
     private void showWayPath(List<LatLng> wayPoints) {

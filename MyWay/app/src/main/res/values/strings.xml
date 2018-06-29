@@ -57,5 +57,7 @@
     <string name="menu_map_normal">Map normal</string>
     <string name="menu_map_hybrid">Map hybrid</string>
     <string name="empty_altitude">- m</string>
+    <string name="start">Start</string>
+    <string name="finish">Finish</string>
 
 </resources>

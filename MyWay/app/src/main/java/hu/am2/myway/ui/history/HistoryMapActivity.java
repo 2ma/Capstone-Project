@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -201,20 +202,31 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
             }
             path = map.addPolyline(new PolylineOptions()
                 .color(Color.GREEN)
-                .width(3)
+                .width(6)
                 .addAll(poly)
             );
             startPoint = map.addMarker(new MarkerOptions()
-                .position(poly.get(0)));
+                .icon(BitmapDescriptorFactory
+                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .position(poly.get(0))
+                .title(getString(R.string.start))
+                .snippet(Utils.getTimeFromMilliseconds(wayPoints.get(0).getTime()))
+            );
             if (size > 1) {
-                endPoint = map.addMarker(new MarkerOptions().position(poly.get(size - 1)));
+                endPoint = map.addMarker(new MarkerOptions().position(poly.get(size - 1)).icon(BitmapDescriptorFactory
+                    .defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    .title(getString(R.string.finish))
+                    .snippet(Utils.getTimeFromMilliseconds(wayPoints.get(size - 1).getTime()))
+                );
             }
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 100));
         }
-
-        distanceText.setText(getString(R.string.distance_unit, way.getTotalDistance()));
-        avgSpeed.setText(getString(R.string.speed_unit, way.getAvgSpeed()));
-        maxSpeed.setText(getString(R.string.speed_unit, way.getMaxSpeed()));
+        String dist = getString(R.string.distance_unit, way.getTotalDistance() / 1000);
+        distanceText.setText(Utils.getSmallSpannable(dist, dist.length() - 3));
+        String as = getString(R.string.speed_unit, way.getAvgSpeed() * 3.6f);
+        avgSpeed.setText(Utils.getSmallSpannable(as, as.length() - 5));
+        String ms = getString(R.string.speed_unit, way.getMaxSpeed() * 3.6f);
+        maxSpeed.setText(Utils.getSmallSpannable(ms, ms.length() - 5));
         if (way.getMaxAltitude() == 9999) {
             maxAltitude.setText(R.string.empty_altitude);
         } else {

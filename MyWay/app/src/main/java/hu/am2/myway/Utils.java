@@ -1,7 +1,9 @@
 package hu.am2.myway;
 
 
+import android.text.SpannableString;
 import android.text.format.DateUtils;
+import android.text.style.RelativeSizeSpan;
 
 public class Utils {
 
@@ -29,6 +31,12 @@ public class Utils {
         sb.append(s);
 
         return sb.toString();
+    }
+
+    public static SpannableString getSmallSpannable(String string, int start) {
+        SpannableString spannableString = new SpannableString(string);
+        spannableString.setSpan(new RelativeSizeSpan(0.5f), start, string.length(), 0);
+        return spannableString;
     }
 
     public static String getTimeForHistory(long totalTime) {
