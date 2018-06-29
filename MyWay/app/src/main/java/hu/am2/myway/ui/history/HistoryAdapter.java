@@ -102,7 +102,7 @@ class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHold
 
         void bindView(Way way) {
             wayNameText.setText(way.getWayName());
-            distanceText.setText(resources.getString(R.string.distance_unit, way.getTotalDistance()));
+            distanceText.setText(resources.getString(R.string.distance_unit, way.getTotalDistance() / 1000));
             totalTimeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
             Date d = new Date(way.getStartTime());
             dateText.setText(dateFormat.format(d));
