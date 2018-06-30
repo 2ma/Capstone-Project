@@ -3,12 +3,15 @@ package hu.am2.myway.ui.history;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +43,7 @@ import hu.am2.myway.Utils;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.location.model.WayPoint;
 import hu.am2.myway.location.model.WayWithWayPoints;
+import timber.log.Timber;
 
 import static hu.am2.myway.ui.map.MapActivity.MAP_TYPE;
 
@@ -47,9 +51,10 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap map;
 
-    private Polyline path;
-    private Marker startPoint;
-    private Marker endPoint;
+    private List<Polyline> paths = new ArrayList<>();
+    private Marker startPointMarker;
+    private Marker endPointMarker;
+    private List<Marker> segmentMarkers = new ArrayList<>();
 
     //details pager layout 1
     private TextView avgSpeedText;
@@ -60,6 +65,8 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private TextView maxSpeedText;
     private TextView maxAltitudeText;
     private TextView minAltitudeText;
+
+    private int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
@@ -166,10 +173,11 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private void setupDetailsPager() {
         View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
         //details pager layout 1
-        layoutOne.findViewById(R.id.speed).setVisibility(View.GONE);
-
         avgSpeedText = layoutOne.findViewById(R.id.speed);
-        avgSpeedText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.avg_speed_icon);
+        int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics());
+        Drawable drawable = getResources().getDrawable(R.drawable.avg_speed_icon);
+        drawable.setBounds(0, 0, iconSize, iconSize);
+        avgSpeedText.setCompoundDrawables(null, null, null, drawable);
         timeText = layoutOne.findViewById(R.id.time);
         distanceText = layoutOne.findViewById(R.id.distance);
 
@@ -198,49 +206,91 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void displayMapHistory(WayWithWayPoints wayWithWayPoints) {
-        if (path != null) {
-            path.remove();
-            path = null;
+        if (paths.size() > 0) {
+            clearPaths();
         }
-        if (startPoint != null) {
-            startPoint.remove();
-            startPoint = null;
+        if (startPointMarker != null) {
+            startPointMarker.remove();
+            startPointMarker = null;
         }
-        if (endPoint != null) {
-            endPoint.remove();
-            endPoint = null;
+        if (endPointMarker != null) {
+            endPointMarker.remove();
+            endPointMarker = null;
+        }
+        if (segmentMarkers.size() > 0) {
+            int s = segmentMarkers.size();
+            for (int i = 0; i < s; i++) {
+                segmentMarkers.get(i).remove();
+            }
+            segmentMarkers.clear();
         }
         Way way = wayWithWayPoints.getWay();
         List<WayPoint> wayPoints = wayWithWayPoints.getWayPoints();
-        int size = wayPoints.size();
-        if (size > 0) {
-            List<LatLng> poly = new ArrayList<>();
-            LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
-            for (int i = 0; i < size; i++) {
-                WayPoint wp = wayPoints.get(i);
-                LatLng point = new LatLng(wp.getLatitude(), wp.getLongitude());
-                poly.add(point);
-                latLngBoundsBuilder.include(point);
-
-            }
-            path = map.addPolyline(new PolylineOptions()
-                .color(Color.GREEN)
-                .width(6)
-                .addAll(poly)
-            );
-            startPoint = map.addMarker(new MarkerOptions()
+        Timber.d("Waypoints size: %d", wayPoints.size());
+        int wayPointsSize = wayPoints.size();
+        if (wayPointsSize > 0) {
+            WayPoint start = wayPoints.get(0);
+            startPointMarker = map.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory
                     .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                .position(poly.get(0))
+                .position(new LatLng(start.getLatitude(), start.getLongitude()))
                 .title(getString(R.string.start))
-                .snippet(Utils.getTimeFromMilliseconds(wayPoints.get(0).getTime()))
+                .snippet(Utils.epochToStringDate(start.getTime()))
             );
-            if (size > 1) {
-                endPoint = map.addMarker(new MarkerOptions().position(poly.get(size - 1)).icon(BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            if (wayPointsSize > 1) {
+                WayPoint end = wayPoints.get(wayPointsSize - 1);
+                endPointMarker = map.addMarker(new MarkerOptions().position(new LatLng(end.getLatitude(), end.getLongitude())).icon
+                    (BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_RED))
                     .title(getString(R.string.finish))
-                    .snippet(Utils.getTimeFromMilliseconds(wayPoints.get(size - 1).getTime()))
+                    .snippet(Utils.epochToStringDate(end.getTime()))
                 );
+            }
+            //builder so we can zoom the map to fit the whole route
+            LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
+            List<LatLng> waySegment = new ArrayList<>();
+            Location last = new Location("gps");
+            last.setLatitude(wayPoints.get(0).getLatitude());
+            last.setLongitude(wayPoints.get(0).getLongitude());
+            for (int i = 0; i < wayPointsSize; i++) {
+                WayPoint w = wayPoints.get(i);
+                if (w.getLatitude() == Constants.WAY_END_COORDINATE) {
+                    if (waySegment.size() > 0) {
+                        //adds start marker for segment if it's not the first
+                        if (startPointMarker != null && !startPointMarker.getPosition().equals(waySegment.get(0))) {
+                            segmentMarkers.add(map.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                                .position(waySegment.get(0))
+                                .title(getString(R.string.segment_end, paths.size()))
+                                .snippet(Utils.epochToStringDate(wayPoints.get(i - waySegment.size()).getTime()))
+                            ));
+                        }
+                        //add segment path if segment has at least 2 markers
+                        if (waySegment.size() > 1) {
+                            paths.add(map.addPolyline(new PolylineOptions()
+                                .color(pathColors[paths.size() % pathColors.length])
+                                .width(6)
+                                .addAll(waySegment)
+                            ));
+                            //add end marker for segment if it's not the last
+                            if (endPointMarker != null && !endPointMarker.getPosition().equals(waySegment.get(waySegment.size() - 1))) {
+                                segmentMarkers.add(map.addMarker(new MarkerOptions()
+                                    .icon(BitmapDescriptorFactory
+                                        .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                                    .position(waySegment.get(waySegment.size() - 1))
+                                    .title(getString(R.string.segment_end, paths.size()))
+                                    .snippet(Utils.epochToStringDate(wayPoints.get(i - 1).getTime()))
+                                ));
+                            }
+                        }
+                        waySegment.clear();
+                    }
+                } else {
+                    LatLng ll = new LatLng(w.getLatitude(), w.getLongitude());
+                    latLngBoundsBuilder.include(ll);
+                    waySegment.add(ll);
+                }
             }
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 100));
         }
@@ -261,5 +311,12 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
             minAltitudeText.setText(getString(R.string.altitude_unit, way.getMinAltitude()));
         }
         timeText.setText(Utils.getTimeFromMilliseconds(way.getTotalTime()));
+    }
+
+    private void clearPaths() {
+        for (int i = 0; i < paths.size(); i++) {
+            paths.get(i).remove();
+        }
+        paths.clear();
     }
 }

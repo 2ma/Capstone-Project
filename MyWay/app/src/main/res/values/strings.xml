@@ -59,5 +59,6 @@
     <string name="empty_altitude">- m</string>
     <string name="start">Start</string>
     <string name="finish">Finish</string>
+    <string name="segment_end">Segment %d Finish</string>
 
 </resources>

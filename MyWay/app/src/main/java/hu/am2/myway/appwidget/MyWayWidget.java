@@ -21,6 +21,7 @@ import hu.am2.myway.location.LocationService;
 import hu.am2.myway.location.model.Way;
 import hu.am2.myway.ui.main.MainActivity;
 import hu.am2.myway.ui.map.MapActivity;
+import timber.log.Timber;
 
 import static hu.am2.myway.location.WayRecorder.STATE_RECORDING;
 import static hu.am2.myway.location.WayRecorder.STATE_STOP;
@@ -54,6 +55,7 @@ public class MyWayWidget extends AppWidgetProvider {
             if (widgetStatus.getState() == STATE_STOP) {
                 defaultWidgetState(context, views, appWidgetManager, appWidgetId);
             } else {
+                Timber.d("Setup widget");
                 views.setTextViewText(R.id.widgetDistanceText, context.getString(R.string.distance_unit, widgetStatus.getDistance()));
                 views.setTextViewText(R.id.widgetTimeText, Utils.getTimeFromMilliseconds(widgetStatus.getTime()));
 
@@ -109,6 +111,7 @@ public class MyWayWidget extends AppWidgetProvider {
         PendingIntent pendingMain = PendingIntent.getActivity(context, 0, intentMain, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget, pendingMain);
         views.setOnClickPendingIntent(R.id.widgetRecordPauseBtn, pendingStart);
+        views.setOnClickPendingIntent(R.id.widgetStopBtn, null);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 

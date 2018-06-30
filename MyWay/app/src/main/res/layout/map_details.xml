@@ -19,8 +19,8 @@
         android:gravity="center"
         android:background="@drawable/blue_round_back"
         android:drawableBottom="@drawable/speed_icon"
-        app:compoundDrawableHeight="32dp"
-        app:compoundDrawableWidth="32dp"
+        app:compoundDrawableHeight="36dp"
+        app:compoundDrawableWidth="36dp"
         android:drawablePadding="-25dp"
         android:elevation="8dp"
         />
