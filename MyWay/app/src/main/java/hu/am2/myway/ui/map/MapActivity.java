@@ -59,6 +59,7 @@ import hu.am2.myway.location.WayRecorder;
 import hu.am2.myway.location.model.WayUiModel;
 import hu.am2.myway.ui.history.DetailsPagerAdapter;
 import hu.am2.myway.ui.history.InterceptViewPager;
+import timber.log.Timber;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -123,9 +124,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });*/
             //locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
+            /*Timber.d("Service connected");
             if (map != null && !locationService.getSpeedLiveData().hasObservers()) {
+                Timber.d("Observer from service connected");
                 observeData();
-            }
+            }*/
+            observeData();
             bound = true;
         }
 
@@ -496,27 +500,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Timber.d("mapReady");
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.setMapType(mapType);
-        if (bound && !locationService.getSpeedLiveData().hasObservers()) {
+        /*if (bound && !locationService.getSpeedLiveData().hasObservers()) {
+            Timber.d("Observe from map ready");
             observeData();
-        }
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        }*/
     }
 }
