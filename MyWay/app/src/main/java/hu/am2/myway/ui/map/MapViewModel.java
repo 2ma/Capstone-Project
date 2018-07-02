@@ -22,7 +22,7 @@ public class MapViewModel extends ViewModel implements SharedPreferences.OnShare
     private final SharedPreferences sharedPreferences;
 
     private final MediatorLiveData<WayUiModel> wayWithWayPointsLiveData = new MediatorLiveData<>();
-    private MutableLiveData<Long> wayId = new MutableLiveData<>();
+    private final MutableLiveData<Long> wayId = new MutableLiveData<>();
     private LiveData<WayWithWayPoints> temp;
 
     @Inject

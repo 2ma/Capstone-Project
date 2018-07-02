@@ -6,7 +6,6 @@ import java.util.List;
 
 public class WayUiModel {
 
-    private final long totalTime;
     //in km
     private final float totalDistance;
     //in km/h
@@ -21,7 +20,6 @@ public class WayUiModel {
     private final List<List<LatLng>> waySegments;
 
     public WayUiModel(Way way, List<List<LatLng>> waySegments) {
-        this.totalTime = way.getTotalTime();
         this.totalDistance = way.getTotalDistance() / 1000;
         this.avgSpeed = way.getAvgSpeed() * 3.6f;
         this.maxAltitude = way.getMaxAltitude();
@@ -32,10 +30,6 @@ public class WayUiModel {
 
     public float getMaxSpeed() {
         return maxSpeed;
-    }
-
-    public long getTotalTime() {
-        return totalTime;
     }
 
     public float getTotalDistance() {

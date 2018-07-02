@@ -8,7 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -51,7 +50,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
-import hu.am2.myway.Constants;
 import hu.am2.myway.R;
 import hu.am2.myway.Utils;
 import hu.am2.myway.location.LocationService;
@@ -63,12 +61,11 @@ import hu.am2.myway.ui.history.InterceptViewPager;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String MAP_TYPE = "MAP_TYPE";
-    private static final String TAG = MapActivity.class.getSimpleName();
     private GoogleMap map;
 
     private LocationService locationService;
 
-    private List<Polyline> paths = new ArrayList<>();
+    private final List<Polyline> paths = new ArrayList<>();
     private Marker currentMarker;
     private Circle circle;
 
@@ -93,7 +90,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private TextView maxAltitudeText;
     private TextView minAltitudeText;
 
-    private int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
+    private final int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
 
     @BindView(R.id.detailViewPager)
     InterceptViewPager detailViewPager;
@@ -115,17 +112,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             locationService = ((LocationService.ServiceBinder) service).getService();
-            /*locationService.getWayUiModelLiveData().observe(MapActivity.this, wayModel -> {
-                if (wayModel != null) {
-                    handleWayUiModel(wayModel);
-                } else {
-                    clearUi();
-                }
-            });*/
-            //locationService.getElapsedTimeLiveData().observe(MapActivity.this, time -> updateElapsedTime(time));
-            if (map != null && !locationService.getSpeedLiveData().hasObservers()) {
-                observeData();
-            }
+            observeData();
             bound = true;
         }
 
@@ -159,9 +146,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         setupDetailsPager();
-        //TODO map could be null when observing
         viewModel = ViewModelProviders.of(this, factory).get(MapViewModel.class);
-        viewModel.getWayUiModelLiveData().observe(this, this::handleWayUiModel);
     }
 
     private void observeData() {
@@ -169,6 +154,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         locationService.getStateLiveData().observe(MapActivity.this, this::handleState);
         locationService.getLocationLiveData().observe(MapActivity.this, this::handleLocation);
         locationService.getSpeedLiveData().observe(MapActivity.this, this::handleSpeed);
+        viewModel.getWayUiModelLiveData().observe(this, this::handleWayUiModel);
     }
 
     private void handleSpeed(Float speed) {
@@ -209,7 +195,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             clearUi();
             return;
         }
-        //timeText.setText(Utils.getTimeFromMilliseconds(wayModel.getTotalTime()));
         String dist = getString(R.string.distance_unit, wayModel.getTotalDistance());
         distanceText.setText(Utils.getSmallSpannable(dist, dist.length() - 3));
         showWayPath(wayModel.getWaySegments());
@@ -227,36 +212,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         avgSpeedText.setText(Utils.getSmallSpannable(avgSpeed, avgSpeed.length() - 5));
         String maxSpeed = getString(R.string.speed_unit, wayModel.getMaxSpeed());
         maxSpeedText.setText(Utils.getSmallSpannable(maxSpeed, maxSpeed.length() - 5));
-
-        /*case WayStatus.STATE_RECORDING: {
-                Timber.d("startPauseRecording");
-                playPauseButtonState(true);
-                List<LatLng> wayPoints = wayModel.getWaySegments();
-                if (wayPoints.size() > 0) {
-                    LatLng lastPos = wayPoints.get(wayPoints.size() - 1);
-                    showWayPath(wayPoints);
-
-                    if (currentMarker == null) {
-                        currentMarker = map.addMarker(new MarkerOptions().position(lastPos));
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPos, 15f));
-                    } else {
-                        currentMarker.setPosition(lastPos);
-                        map.animateCamera(CameraUpdateFactory.newLatLng(lastPos));
-                    }
-                    if (circle == null) {
-                        circle = map.addCircle(new CircleOptions().center(lastPos).radius(location.getAccuracy())
-                            .fillColor(R.color.circleBackground)
-                            .strokeColor(R.color.circleLine)
-                            .strokeWidth(1));
-                    } else {
-                        circle.setCenter(pos);
-                    }
-                    speedText.setText(getString(R.string.speed_unit, location.getSpeed()));
-                    distanceText.setText(getString(R.string.distance_unit, status.getWay().getTotalDistance()));
-                }
-                break;
-            }*/
-
     }
 
     private void clearPaths() {
@@ -364,9 +319,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             dialog.show();
             return true;
         }
-        //TODO check this
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt(Constants.PREF_RECORDING_STATE, WayRecorder.STATE_STOP).apply();
         return false;
     }
 
@@ -496,27 +448,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.setMapType(mapType);
-        if (bound && !locationService.getSpeedLiveData().hasObservers()) {
-            observeData();
-        }
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 }

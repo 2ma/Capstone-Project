@@ -1,6 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="map_details_more_margin">4dp</dimen>
-    <item name="circle_bias" format="float" type="dimen">0.45</item>
-    <dimen name="min_altitude_circle_radius">125dp</dimen>
 </resources>

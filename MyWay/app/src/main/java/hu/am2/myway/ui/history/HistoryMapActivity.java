@@ -50,10 +50,10 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap map;
 
-    private List<Polyline> paths = new ArrayList<>();
+    private final List<Polyline> paths = new ArrayList<>();
     private Marker startPointMarker;
     private Marker endPointMarker;
-    private List<Marker> segmentMarkers = new ArrayList<>();
+    private final List<Marker> segmentMarkers = new ArrayList<>();
 
     //details pager layout 1
     private TextView avgSpeedText;
@@ -65,7 +65,7 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
     private TextView maxAltitudeText;
     private TextView minAltitudeText;
 
-    private int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
+    private final int[] pathColors = {Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.YELLOW, Color.RED};
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 

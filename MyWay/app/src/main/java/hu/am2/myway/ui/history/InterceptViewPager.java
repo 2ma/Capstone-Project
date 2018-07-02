@@ -11,9 +11,9 @@ import android.view.View;
 
 public class InterceptViewPager extends ViewPager {
 
-    View[] pageOne;
-    View[] pageTwo;
-    Rect hitRect = new Rect();
+    private View[] pageOne;
+    private View[] pageTwo;
+    private final Rect hitRect = new Rect();
 
     public InterceptViewPager(@NonNull Context context) {
         super(context);

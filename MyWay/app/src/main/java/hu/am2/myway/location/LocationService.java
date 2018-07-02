@@ -51,7 +51,7 @@ public class LocationService extends Service implements SharedPreferences.OnShar
     WayRecorder wayRecorder;
 
     static final String CHANNEL_ID = "location_channel";
-    static final int NOTIFICATION_ID = 1337;
+    private static final int NOTIFICATION_ID = 1337;
 
     private Handler handler;
 
@@ -269,5 +269,4 @@ public class LocationService extends Service implements SharedPreferences.OnShar
         handler.postDelayed(timeUpdater, 1000);
     }
 
-    private static final String TAG = LocationService.class.getSimpleName();
 }

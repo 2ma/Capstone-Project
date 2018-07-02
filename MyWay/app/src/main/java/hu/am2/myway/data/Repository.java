@@ -41,11 +41,6 @@ public class Repository {
     }
 
     @WorkerThread
-    public WayWithWayPoints getWayWithWayPointsForId(long id) {
-        return wayDao.getWayWithWayPointsForId(id);
-    }
-
-    @WorkerThread
     public LiveData<WayWithWayPoints> getWayWithWayPointsLiveDataForId(long id) {
         return wayDao.getWayWithWayPointsLiveDataForId(id);
     }
