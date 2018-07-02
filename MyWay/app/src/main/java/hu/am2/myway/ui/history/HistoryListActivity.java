@@ -48,8 +48,6 @@ public class HistoryListActivity extends AppCompatActivity implements HistoryAda
 
     private HistoryListViewModel viewModel;
 
-    private static final String TAG = "HistoryListActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);

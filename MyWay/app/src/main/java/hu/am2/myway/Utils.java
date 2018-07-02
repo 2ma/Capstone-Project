@@ -74,22 +74,4 @@ public class Utils {
         }
         return segments;
     }
-
-    public static String getTimeForHistory(long totalTime) {
-        final int H = (int) (totalTime / DateUtils.HOUR_IN_MILLIS);
-        int remains = (int) (totalTime % DateUtils.HOUR_IN_MILLIS);
-
-        final int m = (int) (remains / DateUtils.MINUTE_IN_MILLIS);
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(H);
-        sb.append(":");
-        if (m < 10) {
-            sb.append("0");
-        }
-        sb.append(m);
-
-        return sb.toString();
-    }
 }

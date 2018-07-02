@@ -154,22 +154,6 @@ public class WayRecorder {
         }
     }
 
-   /* void loadWay() {
-        Timber.d("Way loading");
-        long id = sharedPreferences.getLong(Constants.PREF_WAY_ID, -1);
-        if (id != -1) {
-            executors.getServiceExecutor().execute(() -> {
-                synchronized (lock) {
-                    WayWithWayPoints wayWithWayPoints = repository.getWayWithWayPointsForId(id);
-                    wayStatus.initWayStatus(wayWithWayPoints);
-                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
-                    elapsedTime.postValue(wayStatus.getWay().getTotalTime());
-                }
-                Timber.d("Way loaded");
-            });
-        }
-    }*/
-
     void handleLastLocation(Location location) {
         Timber.d("Handle location");
         if (wayId == -1) {
@@ -262,27 +246,6 @@ public class WayRecorder {
                 });
             }
         }
-
-
-
-        /*if (wayStatus.getWay() != null) {
-            Location previousLocation = wayStatus.getLastLocation();
-            if (previousLocation == null) {
-                wayStatus.updateCurrentLocation(location);
-                wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
-                repository.updateWay(wayStatus.getWay());
-                repository.insertWayPoint(new WayPoint(location, wayStatus.getWay().getId()));
-            } else {
-                float dist = location.distanceTo(previousLocation);
-                long time = TimeUnit.NANOSECONDS.toMillis(location.getElapsedRealtimeNanos() - previousLocation.getElapsedRealtimeNanos());
-                if (dist >= distanceInterval && time >= timeInterval) {
-                    wayStatus.updateCurrentLocation(location);
-                    wayUiModelLiveData.postValue(new WayUiModel(wayStatus.getWay(), wayStatus.getWaySegments()));
-                    repository.updateWay(wayStatus.getWay());
-                    repository.insertWayPoint(new WayPoint(location, wayStatus.getWay().getId()));
-                }
-            }
-        }*/
     }
 
     private void calculateTotalTime() {
@@ -456,6 +419,4 @@ public class WayRecorder {
         }
         MyWayWidget.updateAppWidgets(application, appWidgetManager, appWidgetIds, status);
     }
-
-    private static final String TAG = WayRecorder.class.getSimpleName();
 }

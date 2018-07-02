@@ -7,10 +7,8 @@ public final class Constants {
     public static final String ACTION_START_PAUSE_RECORDING = "hu.am2.myway.constants.ACTION_START_PAUSE_RECORDING";
     public static final String ACTION_STOP_RECORDING = "hu.am2.myway.constants.ACTION_STOP_RECORDING";
     public static final String EXTRA_WAY_ID = "hu.am2.myway.constants.EXTRA_WAY_ID";
-    public static final String EXTRA_TOTAL_TIME = "hu.am2.myway.constants.EXTRA_TOTAL_TIME";
 
     public static final double WAY_END_COORDINATE = 10000;
-    public static final double WAY_RESUME_COORDINATE = 20000;
 
     private Constants() {
 

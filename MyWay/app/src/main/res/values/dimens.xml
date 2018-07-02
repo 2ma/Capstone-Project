@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="guideLineTop" format="float" type="dimen">0</item>
-    <item name="circle_bias" format="float" type="dimen">0.5</item>
-    <dimen name="min_altitude_circle_radius">135dp</dimen>
-    <dimen name="map_details_more_margin">8dp</dimen>
+    <dimen name="detail_icon_size">36dp</dimen>
+    <dimen name="detail_icon_size_small">32dp</dimen>
 </resources>

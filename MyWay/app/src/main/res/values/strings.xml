@@ -1,13 +1,6 @@
 <resources>
     <string name="app_name">MyWay</string>
 
-    <string name="speed">Speed:</string>
-    <string name="time">Time:</string>
-    <string name="distance">Distance:</string>
-    <string name="avg_speed">Avg. speed:</string>
-    <string name="max_speed">Max. speed:</string>
-    <string name="max_altitude">Max. alt.:</string>
-    <string name="min_altitude">Min. alt.:</string>
     <string name="distance_unit">%.1f km</string>
     <string name="altitude_unit">%.1f m</string>
     <string name="speed_unit">%.1f km/h</string>
@@ -59,6 +52,7 @@
     <string name="empty_altitude">- m</string>
     <string name="start">Start</string>
     <string name="finish">Finish</string>
-    <string name="segment_end">Segment %d Finish</string>
+    <string name="segment_end">Finish segment-%d</string>
+    <string name="segment_start">Start segment-%d</string>
 
 </resources>

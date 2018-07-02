@@ -12,7 +12,7 @@ import android.view.View;
 import hu.am2.myway.R;
 
 //based on: https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6
-public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
+class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
     private final ColorDrawable background = new ColorDrawable();
     private final Drawable icon;
