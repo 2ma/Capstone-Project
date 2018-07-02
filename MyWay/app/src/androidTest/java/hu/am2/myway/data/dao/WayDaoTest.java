@@ -286,30 +286,42 @@ public class WayDaoTest {
 
     @Test
     public void getAllWayPointsForIdTest() {
+
+        Way way = new Way();
+        way.setAvgSpeed(3);
+        way.setWayName("magicWay");
+        long id = wayDao.insertWay(way);
+
         for (int i = 0; i < 10; i++) {
             WayPoint wp = new WayPoint();
             wp.setLatitude(i);
             wp.setLongitude(i);
-            wp.setWayId(3);
+            wp.setWayId(id);
             wayDao.insertWayPoint(wp);
         }
 
-        List<WayPoint> result = wayDao.getAllWayPointsForWayId(3);
+        List<WayPoint> result = wayDao.getAllWayPointsForWayId(id);
 
         assertThat(result.size(), is(10));
     }
 
     @Test
     public void deleteAllWayPointsForWayIdTest() {
+
+        Way way = new Way();
+        way.setAvgSpeed(3);
+        way.setWayName("magicWay");
+        long id = wayDao.insertWay(way);
+
         for (int i = 0; i < 10; i++) {
             WayPoint wp = new WayPoint();
             wp.setLatitude(i);
             wp.setLongitude(i);
-            wp.setWayId(3);
+            wp.setWayId(id);
             wayDao.insertWayPoint(wp);
         }
 
-        wayDao.deleteAllWayPointsForWayId(3);
+        wayDao.deleteAllWayPointsForWayId(id);
 
         List<WayPoint> result = wayDao.getAllWayPointsForWayId(3);
 
