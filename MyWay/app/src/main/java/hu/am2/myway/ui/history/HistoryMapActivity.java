@@ -11,7 +11,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -174,7 +173,7 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
         View layoutOne = getLayoutInflater().inflate(R.layout.map_details, null);
         //details pager layout 1
         avgSpeedText = layoutOne.findViewById(R.id.speed);
-        int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics());
+        int iconSize = (int) getResources().getDimension(R.dimen.detail_icon_size);
         Drawable drawable = getResources().getDrawable(R.drawable.avg_speed_icon);
         drawable.setBounds(0, 0, iconSize, iconSize);
         avgSpeedText.setCompoundDrawables(null, null, null, drawable);
@@ -237,15 +236,7 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
                 .title(getString(R.string.start))
                 .snippet(Utils.epochToStringDate(start.getTime()))
             );
-            if (wayPointsSize > 1) {
-                WayPoint end = wayPoints.get(wayPointsSize - 1);
-                endPointMarker = map.addMarker(new MarkerOptions().position(new LatLng(end.getLatitude(), end.getLongitude())).icon
-                    (BitmapDescriptorFactory
-                        .defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                    .title(getString(R.string.finish))
-                    .snippet(Utils.epochToStringDate(end.getTime()))
-                );
-            }
+
             //builder so we can zoom the map to fit the whole route
             LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
             List<LatLng> waySegment = new ArrayList<>();
@@ -262,7 +253,7 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
                                 .icon(BitmapDescriptorFactory
                                     .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
                                 .position(waySegment.get(0))
-                                .title(getString(R.string.segment_end, paths.size()))
+                                .title(getString(R.string.segment_start, paths.size() + 1))
                                 .snippet(Utils.epochToStringDate(wayPoints.get(i - waySegment.size()).getTime()))
                             ));
                         }
@@ -273,8 +264,8 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
                                 .width(6)
                                 .addAll(waySegment)
                             ));
-                            //add end marker for segment if it's not the last
-                            if (endPointMarker != null && !endPointMarker.getPosition().equals(waySegment.get(waySegment.size() - 1))) {
+                            //add end marker for segment or final end marker
+                            if (i + 1 < wayPointsSize) {
                                 segmentMarkers.add(map.addMarker(new MarkerOptions()
                                     .icon(BitmapDescriptorFactory
                                         .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
@@ -282,6 +273,14 @@ public class HistoryMapActivity extends AppCompatActivity implements OnMapReadyC
                                     .title(getString(R.string.segment_end, paths.size()))
                                     .snippet(Utils.epochToStringDate(wayPoints.get(i - 1).getTime()))
                                 ));
+                            } else {
+                                WayPoint end = wayPoints.get(i - 1);
+                                endPointMarker = map.addMarker(new MarkerOptions().position(new LatLng(end.getLatitude(), end.getLongitude())).icon
+                                    (BitmapDescriptorFactory
+                                        .defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                                    .title(getString(R.string.finish))
+                                    .snippet(Utils.epochToStringDate(end.getTime()))
+                                );
                             }
                         }
                         waySegment.clear();
