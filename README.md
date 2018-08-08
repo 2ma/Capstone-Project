@@ -1,6 +1,10 @@
 # Capstone-Project
 This is the final project for the Udacity Google Developer Nanodegree Scholarship Android developer course.
 
+<p align="center">
+ <img src="https://github.com/2ma/Capstone-Project/blob/master/images/IMG_2269.JPG" width="800"/>
+ </p>
+
 MyWay is a gps track recording application, that lets you record any outside activities. 
 You can record biking, hiking, walking and various other activities. 
 It shows your speed, elevation, distance, time. It lets you revisit previous recordings too.
